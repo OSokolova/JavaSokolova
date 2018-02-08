@@ -1,5 +1,3 @@
-package ru.academits.sokolova.range;
-
 public class Range {
     private double from;
     private double to;

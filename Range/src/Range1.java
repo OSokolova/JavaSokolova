@@ -1,4 +1,3 @@
-package ru.academits.sokolova.range;
 import java.util.Scanner;
 
 public class Range1 {
