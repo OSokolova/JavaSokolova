@@ -1,4 +1,4 @@
-package ru.academits.sokolova.range
+package ru.academits.sokolova.range;
 
 public class Range {
     private double from;
