@@ -5,7 +5,9 @@ public class Range {
     private double to;
 
 
-    public Range() {
+    public Range(double from, double to) {
+        this.from = from;
+        this.to = to;
     }
 
     public void setFrom(double from) {
@@ -17,18 +19,18 @@ public class Range {
     }
 
     public double getFrom() {
-        return this.from;
+        return from;
     }
 
     public double getTo() {
-        return this.to;
+        return to;
     }
 
     public double getLength() {
-        return getTo() - getFrom();
+        return to - from;
     }
 
-    public boolean IsInside(double number) {
-        return number >= getFrom() && number <= getTo();
+    public boolean isInside(double number) {
+        return number >= from && number <= to;
     }
 }
