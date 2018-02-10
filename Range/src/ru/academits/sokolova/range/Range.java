@@ -33,4 +33,46 @@ public class Range {
     public boolean isInside(double number) {
         return number >= from && number <= to;
     }
+
+    public Range getCross(Range range) {
+        if ((this.to < range.getFrom()) || (range.getTo() < this.from)) {
+            return null;
+        } else if (isInside(range.getFrom()) && isInside(range.getTo())) {
+            return range;
+        }
+        return new Range(range.getFrom(), this.to);
+    }
+
+    public Range[] getUnion(Range range) {
+        Range[] array;
+        if (getCross(range) == null) {
+            array = new Range[2];
+            array[0] = new Range(from, to);
+            array[1] = range;
+        } else if (getCross(range) == range) {
+            array = new Range[1];
+            array[0] = range;
+        } else {
+            array = new Range[1];
+            array[0] = new Range(range.getFrom(), to);
+        }
+        return array;
+    }
+
+    public Range[] getDifference(Range range) {
+        Range[] array;
+        if (getCross(range) == null) {
+            array = new Range[1];
+            array[0] = new Range(from, to);
+        } else if (getCross(range) == range) {
+            array = new Range[2];
+            array[0] = new Range(from, range.getFrom());
+            array[1] = new Range(range.getTo(), to);
+        } else {
+            array = new Range[1];
+            array[0] = new Range(from, range.getFrom());
+        }
+        return array;
+    }
 }
+
