@@ -12,8 +12,7 @@ public class TwoRanges {
         System.out.println("Введите второй интервал");
         Range range2 = new Range(scanner.nextDouble(), scanner.nextDouble());
 
-        Range rangeCross;
-        rangeCross = range1.getCross(range2);
+        Range rangeCross = range1.getCross(range2);
         if (rangeCross == null) {
             System.out.println("Пересечения нет");
         } else {

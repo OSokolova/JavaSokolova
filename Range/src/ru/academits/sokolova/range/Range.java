@@ -51,10 +51,10 @@ public class Range {
             array[1] = range;
         } else if (getCross(range) == range) {
             array = new Range[1];
-            array[0] = range;
+            array[0] = new Range(from,to);
         } else {
             array = new Range[1];
-            array[0] = new Range(range.getFrom(), to);
+            array[0] = new Range(from, range.getTo());
         }
         return array;
     }
