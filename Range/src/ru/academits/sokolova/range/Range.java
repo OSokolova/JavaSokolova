@@ -35,44 +35,79 @@ public class Range {
     }
 
     public Range getCross(Range range) {
-        if ((this.to < range.getFrom()) || (range.getTo() < this.from)) {
+        if (this.from < range.from) {
+            if (isInside(range.from)) {
+                if (isInside(range.to)) {
+                    return range;
+                }
+                return new Range(range.from, this.to);
+            }
             return null;
-        } else if (isInside(range.getFrom()) && isInside(range.getTo())) {
-            return range;
+        } else {
+            if (range.isInside(from)) {
+                if (range.isInside(to)) {
+                    return this;
+                }
+                return new Range(from, range.to);
+            }
         }
-        return new Range(range.getFrom(), this.to);
+        return null;
     }
 
     public Range[] getUnion(Range range) {
-        Range[] array;
-        if (getCross(range) == null) {
-            array = new Range[2];
-            array[0] = new Range(from, to);
-            array[1] = range;
-        } else if (getCross(range) == range) {
-            array = new Range[1];
-            array[0] = new Range(from,to);
+        if (this.from < range.from) {
+            if (isInside(range.from)) {
+                if (isInside(range.to)) {
+                    return new Range[]{this};
+                }
+                return new Range[]{new Range(from, range.to)};
+            }
+            return new Range[]{this, range};
         } else {
-            array = new Range[1];
-            array[0] = new Range(from, range.getTo());
+            if (range.isInside(from)) {
+                if (range.isInside(to)) {
+                    return new Range[]{range};
+                }
+                return new Range[]{new Range(range.from, to)};
+            }
         }
-        return array;
+        return new Range[]{range, this};
     }
 
     public Range[] getDifference(Range range) {
-        Range[] array;
-        if (getCross(range) == null) {
-            array = new Range[1];
-            array[0] = new Range(from, to);
-        } else if (getCross(range) == range) {
-            array = new Range[2];
-            array[0] = new Range(from, range.getFrom());
-            array[1] = new Range(range.getTo(), to);
+        if (this.from < range.from) {
+            if (isInside(range.from)) {
+                if (isInside(range.to)) {
+                    return new Range[]{new Range(from, range.from), new Range(range.to, to)};
+                }
+                return new Range[]{new Range(from, range.from)};
+            }
         } else {
-            array = new Range[1];
-            array[0] = new Range(from, range.getFrom());
+            if (range.isInside(from)) {
+                if (range.isInside(to)) {
+                    return null;
+                }
+                return new Range[]{new Range(range.to, to)};
+            }
         }
-        return array;
+        return new Range[]{this};
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
