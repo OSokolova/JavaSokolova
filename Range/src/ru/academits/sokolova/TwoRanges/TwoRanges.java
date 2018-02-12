@@ -1,4 +1,4 @@
-package ru.academits.sokolova.twoRanges;
+package ru.academits.sokolova.TwoRanges;
 
 import ru.academits.sokolova.range.Range;
 
@@ -27,15 +27,11 @@ public class TwoRanges {
             System.out.println(e.getFrom() + " " + e.getTo());
         }
 
-        Range[] rangeDifference = range1Copy.getDifference(range2Copy);
         System.out.println("Разность");
-        if (rangeDifference == null) {
-            System.out.println("пустое множество");
-        } else {
-            for (Range e : rangeDifference) {
-                System.out.println(e.getFrom() + " " + e.getTo());
-            }
+        for (Range e : range1Copy.getDifference(range2Copy)) {
+            System.out.println(e.getFrom() + " " + e.getTo());
         }
     }
 }
+
 

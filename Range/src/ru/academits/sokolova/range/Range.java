@@ -36,16 +36,16 @@ public class Range {
 
     public Range getCross(Range range) {
         if (this.from < range.from) {
-            if (isInside(range.from)) {
-                if (isInside(range.to)) {
+            if (this.to >= range.from) {
+                if (this.to >= range.to) {
                     return range;
                 }
                 return new Range(range.from, this.to);
             }
             return null;
         } else {
-            if (range.isInside(from)) {
-                if (range.isInside(to)) {
+            if (this.from <= range.to) {
+                if (this.to <= range.to) {
                     return this;
                 }
                 return new Range(from, range.to);
@@ -56,16 +56,16 @@ public class Range {
 
     public Range[] getUnion(Range range) {
         if (this.from < range.from) {
-            if (isInside(range.from)) {
-                if (isInside(range.to)) {
+            if (this.to >= range.from) {
+                if (this.to >= range.to) {
                     return new Range[]{this};
                 }
                 return new Range[]{new Range(from, range.to)};
             }
             return new Range[]{this, range};
         } else {
-            if (range.isInside(from)) {
-                if (range.isInside(to)) {
+            if (this.from <= range.to) {
+                if (this.to <= range.to) {
                     return new Range[]{range};
                 }
                 return new Range[]{new Range(range.from, to)};
@@ -76,16 +76,16 @@ public class Range {
 
     public Range[] getDifference(Range range) {
         if (this.from < range.from) {
-            if (isInside(range.from)) {
-                if (isInside(range.to)) {
+            if (this.to >= range.from) {
+                if (this.to >= range.to) {
                     return new Range[]{new Range(from, range.from), new Range(range.to, to)};
                 }
                 return new Range[]{new Range(from, range.from)};
             }
         } else {
-            if (range.isInside(from)) {
-                if (range.isInside(to)) {
-                    return null;
+            if (this.from <= range.to) {
+                if (this.to <= range.to) {
+                    return new Range[0];
                 }
                 return new Range[]{new Range(range.to, to)};
             }
