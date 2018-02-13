@@ -12,10 +12,7 @@ public class TwoRanges {
         System.out.println("Введите второй интервал");
         Range range2 = new Range(scanner.nextDouble(), scanner.nextDouble());
 
-        Range range1Copy = new Range(range1.getFrom(), range1.getTo());
-        Range range2Copy = new Range(range2.getFrom(), range2.getTo());
-
-        Range rangeCross = range1Copy.getCross(range2Copy);
+        Range rangeCross = range1.getCross(range2);
         if (rangeCross == null) {
             System.out.println("Пересечения нет");
         } else {
@@ -23,13 +20,17 @@ public class TwoRanges {
         }
 
         System.out.println("Объединение");
-        for (Range e : range1Copy.getUnion(range2Copy)) {
+        for (Range e : range1.getUnion(range2)) {
             System.out.println(e.getFrom() + " " + e.getTo());
         }
 
         System.out.println("Разность");
-        for (Range e : range1Copy.getDifference(range2Copy)) {
-            System.out.println(e.getFrom() + " " + e.getTo());
+        if (range1.getDifference(range2).length == 0) {
+            System.out.println("Пустое множество");
+        } else {
+            for (Range e : range1.getDifference(range2)) {
+                System.out.println(e.getFrom() + " " + e.getTo());
+            }
         }
     }
 }

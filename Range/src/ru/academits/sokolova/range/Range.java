@@ -35,64 +35,66 @@ public class Range {
     }
 
     public Range getCross(Range range) {
-        if (this.from < range.from) {
-            if (this.to >= range.from) {
-                if (this.to >= range.to) {
-                    return range;
-                }
-                return new Range(range.from, this.to);
-            }
+
+        Range copy1 = new Range(getFrom(), getTo());
+        copy1.setFrom(this.from);
+        copy1.setTo(this.to);
+        Range copy2 = new Range(getFrom(), getTo());
+        copy2.setFrom(range.from);
+        copy2.setTo(range.to);
+
+        if ((copy1.to < copy2.from) || (copy2.to < copy1.from)) {
             return null;
-        } else {
-            if (this.from <= range.to) {
-                if (this.to <= range.to) {
-                    return this;
-                }
-                return new Range(from, range.to);
-            }
         }
-        return null;
+        return new Range(Math.max(copy1.from, copy2.from), Math.min(copy1.to, copy2.to));
     }
 
     public Range[] getUnion(Range range) {
-        if (this.from < range.from) {
-            if (this.to >= range.from) {
-                if (this.to >= range.to) {
-                    return new Range[]{this};
-                }
-                return new Range[]{new Range(from, range.to)};
-            }
-            return new Range[]{this, range};
-        } else {
-            if (this.from <= range.to) {
-                if (this.to <= range.to) {
-                    return new Range[]{range};
-                }
-                return new Range[]{new Range(range.from, to)};
-            }
+
+        Range copy1 = new Range(getFrom(), getTo());
+        copy1.setFrom(this.from);
+        copy1.setTo(this.to);
+        Range copy2 = new Range(getFrom(), getTo());
+        copy2.setFrom(range.from);
+        copy2.setTo(range.to);
+
+        if (copy1.to < copy2.from) {
+            return new Range[]{copy1, copy2};
+        } else if (copy2.to < copy1.from) {
+            return new Range[]{copy2, copy1};
         }
-        return new Range[]{range, this};
+        return new Range[]{new Range(Math.min(copy1.from, copy2.from), Math.max(copy1.to, copy2.to))};
     }
 
     public Range[] getDifference(Range range) {
-        if (this.from < range.from) {
-            if (this.to >= range.from) {
-                if (this.to >= range.to) {
-                    return new Range[]{new Range(from, range.from), new Range(range.to, to)};
+
+        Range copy1 = new Range(getFrom(), getTo());
+        copy1.setFrom(this.from);
+        copy1.setTo(this.to);
+        Range copy2 = new Range(getFrom(), getTo());
+        copy2.setFrom(range.from);
+        copy2.setTo(range.to);
+
+        if (copy1.from < copy2.from) {
+            if (copy1.to >= copy2.from) {
+                if (copy1.to > copy2.to) {
+                    return new Range[]{new Range(copy1.from, copy2.from), new Range(copy2.to, copy1.to)};
                 }
-                return new Range[]{new Range(from, range.from)};
+                return new Range[]{new Range(copy1.from, copy2.from)};
             }
         } else {
-            if (this.from <= range.to) {
-                if (this.to <= range.to) {
+            if (copy1.from <= copy2.to) {
+                if (copy1.to <= copy2.to) {
                     return new Range[0];
                 }
-                return new Range[]{new Range(range.to, to)};
+                return new Range[]{new Range(copy2.to, copy1.to)};
             }
         }
-        return new Range[]{this};
+        return new Range[]{copy1};
     }
 }
+
+
 
 
 
