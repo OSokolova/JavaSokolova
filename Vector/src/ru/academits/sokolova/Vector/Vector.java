@@ -133,14 +133,14 @@ public class Vector {
 
     }
 
-    public int hashCode(Vector vector) {
+    public int hashCode() {
         final int number = 17;
         long result = 1;
         for (double e : array
                 ) {
-            result = result * number + (long) e;
+            result = result * number + Double.doubleToLongBits(e);
         }
-        return (int) result;
+        return (int)result;
     }
 
     public static Vector getSum(Vector vector1, Vector vector2) {
