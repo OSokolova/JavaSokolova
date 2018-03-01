@@ -1,16 +1,11 @@
 package ru.academits.sokolova.Vector;
 
-import java.sql.Array;
-import java.util.Arrays;
-
-import static jdk.nashorn.internal.objects.ArrayBufferView.length;
-
 public class Vector {
     private double[] array;
 
     public Vector(int n) {
         if (n <= 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Вектор такой длины не существует");
         } else {
             this.array = new double[n];
             for (int i = 0; i < n; i++) {
@@ -20,33 +15,29 @@ public class Vector {
     }
 
     public Vector(Vector vector) {
-
         this.array = new double[vector.array.length];
-        for (int i = 0; i < vector.array.length; i++) {
-            this.array[i] = vector.array[i];
-        }
+        System.arraycopy(vector.array, 0, this.array, 0, vector.array.length);
+
     }
 
     public Vector(double... array) {
-        this.array = new double[array.length];
-        for (int i = 0; i < array.length; i++) {
-            this.array[i] = array[i];
+        if (array.length == 0) {
+            throw new IllegalArgumentException("Вектор такой длины не существует");
+        } else {
+            this.array = new double[array.length];
+            System.arraycopy(array, 0, this.array, 0, array.length);
         }
     }
 
     public Vector(int n, double... array) {
-        this.array = new double[n];
         if (n <= 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Вектор такой длины не существует");
         } else {
+            this.array = new double[n];
             for (int i = 0; i < n; i++) {
                 this.array[i] = (i < array.length) ? array[i] : 0;
             }
         }
-    }
-
-    public double[] getArray() {
-        return array;
     }
 
     public int getSize() {
@@ -54,71 +45,77 @@ public class Vector {
     }
 
     public String toString() {
-        String s = Arrays.toString(array).substring(1, Arrays.toString(array).length() - 1);
-        return "{" + s + "}";
-    }
-
-    public double[] getSum(Vector other) {
-        int n = Math.max(this.array.length, other.array.length);
-        double[] sum = new double[n];
-        for (int i = 0; i < n; i++) {
-            sum[i] = ((i < this.array.length) ? this.array[i] : 0) + ((i < other.array.length) ? other.array[i] : 0);
-        }
-        return sum;
-    }
-
-    public double[] getDif(Vector other) {
-        int n = Math.max(this.array.length, other.array.length);
-        double[] dif = new double[n];
-        for (int i = 0; i < n; i++) {
-            dif[i] = ((i < this.array.length) ? this.array[i] : 0) - ((i < other.array.length) ? other.array[i] : 0);
-        }
-        return dif;
-    }
-
-    public double[] getMult(double scalar) {
-        double[] mult = new double[array.length];
+        StringBuilder s = new StringBuilder();
         for (int i = 0; i < array.length; i++) {
-            mult[i] = array[i] * scalar;
+            s.append(getComponent(i)).append(", ");
         }
-        return mult;
+        return "{" + s.delete(s.length() - 2, s.length()) + "}";
     }
 
-    public double[] getInversion() {
-        double[] inversion = new double[array.length];
-        for (int i = 0; i < array.length; i++) {
-            inversion[i] = array[i] * (-1);
+    public Vector getSum(Vector other) {
+        Vector copyThis = new Vector(this);
+        Vector copyOther = new Vector(other);
+        int n = Math.max(copyThis.array.length, copyOther.array.length);
+        this.array = new double[n];
+        for (int i = 0; i < n; i++) {
+            this.array[i] = ((i < copyThis.array.length) ? copyThis.array[i] : 0) + ((i < copyOther.array.length) ? copyOther.array[i] : 0);
         }
-        return inversion;
+        return this;
+    }
+
+    public Vector getDiff(Vector other) {
+        Vector copyThis = new Vector(this);
+        Vector copyOther = new Vector(other);
+        int n = Math.max(copyThis.array.length, copyOther.array.length);
+        this.array = new double[n];
+        for (int i = 0; i < n; i++) {
+            this.array[i] = ((i < copyThis.array.length) ? copyThis.array[i] : 0) - ((i < copyOther.array.length) ? copyOther.array[i] : 0);
+        }
+        return this;
+    }
+
+    public Vector getMult(double scalar) {
+        for (int i = 0; i < array.length; i++) {
+            this.array[i] = array[i] * scalar;
+        }
+        return this;
+    }
+
+    public Vector getInversion() {
+        this.getMult(-1);
+        return this;
     }
 
     public double getLength() {
         double length = 0;
-        for (int i = 0; i < array.length; i++) {
-            length += array[i] * array[i];
+        for (double e :
+                array) {
+            length += e * e;
         }
-        length = Math.sqrt(length);
-        return length;
+        return Math.sqrt(length);
     }
 
     public double getComponent(int index) {
         if ((index >= 0) && (index < array.length)) {
             return array[index];
         } else {
-            throw new IllegalArgumentException();
+            throw new IndexOutOfBoundsException("Индекс больше размерности вектора");
         }
     }
 
     public void setComponent(int index, int number) {
         if (index >= array.length) {
-            throw new IllegalArgumentException();
+            throw new IndexOutOfBoundsException("Индекс больше размерности вектора");
         } else {
             array[index] = number;
         }
     }
 
     public boolean equals(Vector vector) {
-        if (array == vector.array) {
+        if (vector == null) {
+            return false;
+        }
+        if (vector == this) {
             return true;
         }
         if (array.length != vector.array.length) {
@@ -130,42 +127,36 @@ public class Vector {
             }
         }
         return true;
-
     }
 
     public int hashCode() {
         final int number = 17;
         long result = 1;
-        for (double e : array
-                ) {
+        for (double e : array) {
             result = result * number + Double.doubleToLongBits(e);
         }
-        return (int)result;
+        return (int) result;
     }
 
     public static Vector getSum(Vector vector1, Vector vector2) {
-        int n = Math.max(vector1.array.length, vector2.array.length);
-        double[] sum = new double[n];
-        for (int i = 0; i < n; i++) {
-            sum[i] = ((i < vector1.array.length) ? vector1.array[i] : 0) + ((i < vector2.array.length) ? vector2.array[i] : 0);
-        }
-        return new Vector(sum);
+        Vector copyVector1 = new Vector(vector1);
+        Vector copyVector2 = new Vector(vector2);
+        return new Vector(copyVector1.getSum(copyVector2));
     }
 
-    public static Vector getDif(Vector vector1, Vector vector2) {
-        int n = Math.max(vector1.array.length, vector2.array.length);
-        double[] dif = new double[n];
-        for (int i = 0; i < n; i++) {
-            dif[i] = ((i < vector1.array.length) ? vector1.array[i] : 0) - ((i < vector2.array.length) ? vector2.array[i] : 0);
-        }
-        return new Vector(dif);
+    public static Vector getDiff(Vector vector1, Vector vector2) {
+        Vector copyVector1 = new Vector(vector1);
+        Vector copyVector2 = new Vector(vector2);
+        return new Vector(copyVector1.getDiff(copyVector2));
     }
 
     public static double getMult(Vector vector1, Vector vector2) {
-        int n = Math.max(vector1.array.length, vector2.array.length);
+        Vector copyVector1 = new Vector(vector1);
+        Vector copyVector2 = new Vector(vector2);
+        int n = Math.min(copyVector1.array.length, copyVector2.array.length);
         double mult = 0;
         for (int i = 0; i < n; i++) {
-            mult += ((i < vector1.array.length) ? vector1.array[i] : 0) * ((i < vector2.array.length) ? vector2.array[i] : 0);
+            mult += copyVector1.array[i] * copyVector2.array[i];
         }
         return mult;
     }
