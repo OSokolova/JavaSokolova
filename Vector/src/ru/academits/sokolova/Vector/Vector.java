@@ -86,7 +86,7 @@ public class Vector {
     }
 
     public double getComponent(int index) {
-        if ((index >= 0) && (index < array.length)) {
+        if (index >= 0 && index < array.length) {
             return array[index];
         } else {
             throw new IndexOutOfBoundsException("Неправильный индекс");
@@ -94,10 +94,10 @@ public class Vector {
     }
 
     public void setComponent(int index, double number) {
-        if (index >= array.length || index < 0) {
-            throw new IndexOutOfBoundsException("Неправильный индекс");
-        } else {
+        if (index >= 0 && index < array.length) {
             array[index] = number;
+        } else {
+            throw new IndexOutOfBoundsException("Неправильный индекс");
         }
     }
 
@@ -139,13 +139,13 @@ public class Vector {
         return new Vector(copyVector1.getDiff(vector2));
     }
 
-    public static double getMult(Vector vector1, Vector vector2) {
+    public static double getMultiplication(Vector vector1, Vector vector2) {
         int n = Math.min(vector1.array.length, vector2.array.length);
-        double mult = 0;
+        double multiplication = 0;
         for (int i = 0; i < n; i++) {
-            mult += vector1.array[i] * vector2.array[i];
+            multiplication += vector1.array[i] * vector2.array[i];
         }
-        return mult;
+        return multiplication;
     }
 }
 

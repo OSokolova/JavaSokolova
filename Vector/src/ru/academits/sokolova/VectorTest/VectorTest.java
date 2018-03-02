@@ -23,8 +23,10 @@ public class VectorTest {
 
         System.out.println(vector4);//печать компонентов вектора
 
-        System.out.println(vector4.getSum(vector3));
+        System.out.println(Vector.getSum(vector4, vector3));//вектор суммы векторов
+        System.out.println(Vector.getDiff(vector3, vector4));//вектор разности векторов
 
+        System.out.println(vector4.getSum(vector3));
         System.out.println(vector3.getDiff(vector4));
 
         System.out.println(vector3.getMult(4));
@@ -44,9 +46,8 @@ public class VectorTest {
         System.out.println(vector1.hashCode());
         System.out.println(vector2.hashCode());
 
-        System.out.println(Vector.getSum(vector4, vector3));//вектор суммы векторов
-        System.out.println(Vector.getDiff(vector3, vector4));//вектор разности векторов
-        System.out.println(Vector.getMult(vector3, vector3));//скалярное произведение векторов
+
+        System.out.println(Vector.getMultiplication(vector3, vector3));//скалярное произведение векторов
     }
 }
 
