@@ -44,8 +44,8 @@ public class VectorTest {
         System.out.println(vector1.hashCode());
         System.out.println(vector2.hashCode());
 
-        System.out.println(Vector.getSum(vector1, vector3));//вектор суммы векторов
-        System.out.println(Vector.getDiff(vector1, vector3));//вектор разности векторов
+        System.out.println(Vector.getSum(vector4, vector3));//вектор суммы векторов
+        System.out.println(Vector.getDiff(vector3, vector4));//вектор разности векторов
         System.out.println(Vector.getMult(vector3, vector3));//скалярное произведение векторов
     }
 }

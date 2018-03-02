@@ -39,20 +39,19 @@ public class Vector {
 
     public String toString() {
         StringBuilder s = new StringBuilder();
+        s.append("{");
         for (int i = 0; i < array.length; i++) {
             s.append(getComponent(i)).append(", ");
         }
-        return s.insert(0, "{").delete(s.length() - 2, s.length()).insert(s.length(), "}").toString();
+        return s.delete(s.length() - 2, s.length()).append("}").toString();
     }
 
     public Vector getSum(Vector other) {
         if (array.length < other.array.length) {
             array = Arrays.copyOf(array, other.array.length);
-        } else {
-            other.array = Arrays.copyOf(other.array, array.length);
         }
-        for (int i = 0; i < array.length; i++) {
-            array[i] = array[i] + other.array[i];
+        for (int i = 0; i < other.array.length; i++) {
+            array[i] += other.array[i];
         }
         return this;
     }
@@ -60,11 +59,9 @@ public class Vector {
     public Vector getDiff(Vector other) {
         if (array.length < other.array.length) {
             array = Arrays.copyOf(array, other.array.length);
-        } else {
-            other.array = Arrays.copyOf(other.array, array.length);
         }
-        for (int i = 0; i < array.length; i++) {
-            array[i] = array[i] - other.array[i];
+        for (int i = 0; i < other.array.length; i++) {
+            array[i] -= other.array[i];
         }
         return this;
     }
@@ -92,7 +89,7 @@ public class Vector {
         if ((index >= 0) && (index < array.length)) {
             return array[index];
         } else {
-            throw new IndexOutOfBoundsException("Индекс больше размерности вектора");
+            throw new IndexOutOfBoundsException("Неправильный индекс");
         }
     }
 
@@ -108,7 +105,7 @@ public class Vector {
         if (this == o) {
             return true;
         }
-        if (o.getClass() == null || o.getClass() != this.getClass()) {
+        if (o == null || o.getClass() != this.getClass()) {
             return false;
         }
         Vector v = (Vector) o;
@@ -133,23 +130,13 @@ public class Vector {
     }
 
     public static Vector getSum(Vector vector1, Vector vector2) {
-        if (vector1.array.length < vector2.array.length) {
-            Vector copyVector2 = new Vector(vector2);
-            return new Vector(vector1.getSum(copyVector2));
-        } else {
-            Vector copyVector1 = new Vector(vector1);
-            return new Vector(copyVector1.getSum(vector2));
-        }
+        Vector copyVector1 = new Vector(vector1);
+        return new Vector(copyVector1.getSum(vector2));
     }
 
     public static Vector getDiff(Vector vector1, Vector vector2) {
-        if (vector1.array.length < vector2.array.length) {
-            Vector copyVector2 = new Vector(vector2);
-            return new Vector(vector1.getDiff(copyVector2));
-        } else {
-            Vector copyVector1 = new Vector(vector1);
-            return new Vector(copyVector1.getDiff(vector2));
-        }
+        Vector copyVector1 = new Vector(vector1);
+        return new Vector(copyVector1.getDiff(vector2));
     }
 
     public static double getMult(Vector vector1, Vector vector2) {
