@@ -29,10 +29,7 @@ public class Vector {
         if (n <= 0) {
             throw new IllegalArgumentException("Вектор такой длины не существует");
         } else {
-            this.array = new double[n];
-            for (int i = 0; i < n; i++) {
-                this.array[i] = (i < array.length) ? array[i] : 0;
-            }
+            this.array = Arrays.copyOf(array, n);
         }
     }
 
@@ -45,26 +42,31 @@ public class Vector {
         for (int i = 0; i < array.length; i++) {
             s.append(getComponent(i)).append(", ");
         }
-        return s.delete(s.length() - 2, s.length()).insert(0, "{").insert(s.length(), "}").toString();
+        return s.insert(0, "{").delete(s.length() - 2, s.length()).insert(s.length(), "}").toString();
     }
 
     public Vector getSum(Vector other) {
-        if (this.array.length >= other.array.length) {
-            for (int i = 0; i < other.array.length; i++) {
-                this.array[i] = this.array[i] + other.array[i];
-            }
+        if (array.length < other.array.length) {
+            array = Arrays.copyOf(array, other.array.length);
         } else {
-            double[] array = new double[other.array.length];
-            for (int i = 0; i < other.array.length; i++) {
-                array[i] = (i < this.array.length) ? this.array[i] + other.array[i] : other.array[i];
-            }
-            this.array = array;
+            other.array = Arrays.copyOf(other.array, array.length);
+        }
+        for (int i = 0; i < array.length; i++) {
+            array[i] = array[i] + other.array[i];
         }
         return this;
     }
 
     public Vector getDiff(Vector other) {
-        return this.getSum(other.getInversion());
+        if (array.length < other.array.length) {
+            array = Arrays.copyOf(array, other.array.length);
+        } else {
+            other.array = Arrays.copyOf(other.array, array.length);
+        }
+        for (int i = 0; i < array.length; i++) {
+            array[i] = array[i] - other.array[i];
+        }
+        return this;
     }
 
     public Vector getMult(double scalar) {
@@ -95,21 +97,19 @@ public class Vector {
     }
 
     public void setComponent(int index, double number) {
-        if (index >= array.length) {
-            throw new IndexOutOfBoundsException("Индекс больше размерности вектора");}
-            else if (index < 0){
-            throw new IndexOutOfBoundsException("Отрицательного индекса не существует");
+        if (index >= array.length || index < 0) {
+            throw new IndexOutOfBoundsException("Неправильный индекс");
         } else {
             array[index] = number;
         }
     }
 
     public boolean equals(Object o) {
-        if (o.getClass() != this.getClass()) {
-            return false;
-        }
         if (this == o) {
             return true;
+        }
+        if (o.getClass() == null || o.getClass() != this.getClass()) {
+            return false;
         }
         Vector v = (Vector) o;
         if (array.length != v.array.length) {
@@ -133,22 +133,30 @@ public class Vector {
     }
 
     public static Vector getSum(Vector vector1, Vector vector2) {
-        Vector copyVector2 = new Vector(vector2);
-        return new Vector(vector1.getSum(copyVector2));
+        if (vector1.array.length < vector2.array.length) {
+            Vector copyVector2 = new Vector(vector2);
+            return new Vector(vector1.getSum(copyVector2));
+        } else {
+            Vector copyVector1 = new Vector(vector1);
+            return new Vector(copyVector1.getSum(vector2));
+        }
     }
 
     public static Vector getDiff(Vector vector1, Vector vector2) {
-        Vector copyVector2 = new Vector(vector2);
-        return new Vector(vector1.getDiff(copyVector2));
+        if (vector1.array.length < vector2.array.length) {
+            Vector copyVector2 = new Vector(vector2);
+            return new Vector(vector1.getDiff(copyVector2));
+        } else {
+            Vector copyVector1 = new Vector(vector1);
+            return new Vector(copyVector1.getDiff(vector2));
+        }
     }
 
     public static double getMult(Vector vector1, Vector vector2) {
-        double[] array1 = Arrays.copyOf(vector1.array, vector1.array.length);
-        double[] array2 = Arrays.copyOf(vector2.array, vector2.array.length);
-        int n = Math.min(array1.length, array2.length);
+        int n = Math.min(vector1.array.length, vector2.array.length);
         double mult = 0;
         for (int i = 0; i < n; i++) {
-            mult += array1[i] * array2[i];
+            mult += vector1.array[i] * vector2.array[i];
         }
         return mult;
     }

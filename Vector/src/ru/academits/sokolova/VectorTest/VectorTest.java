@@ -35,7 +35,7 @@ public class VectorTest {
 
         System.out.println(vector3.getComponent(4));
 
-        vector3.setComponent(-9, 15);
+        vector3.setComponent(8, 15);
         System.out.println(vector3);
 
         System.out.println(vector4.equals(vector3));
