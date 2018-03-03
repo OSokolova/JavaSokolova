@@ -130,11 +130,11 @@ public class Vector {
     }
 
     public static Vector getSum(Vector vector1, Vector vector2) {
-        return new Vector(new Vector(vector1).getSum(vector2));
+        return new Vector(vector1).getSum(vector2);
     }
 
     public static Vector getDiff(Vector vector1, Vector vector2) {
-        return new Vector(new Vector(vector1).getDiff(vector2));
+        return new Vector(vector1).getDiff(vector2);
     }
 
     public static double getMultiplication(Vector vector1, Vector vector2) {
