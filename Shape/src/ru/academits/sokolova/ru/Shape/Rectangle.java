@@ -28,17 +28,20 @@ public class Rectangle implements Shape {
         return (side1 + side2) * 2;
     }
 
+@Override
     public String toString() {
         return "Фигура " + NAME + ": периметр = " + getPerimeter() + ", площадь= " + getArea() +
                 ", высота = " + getHeight() + ", ширина = " + getWidth();
     }
 
+@Override
     public int hashCode() {
         return 17 + NAME.hashCode() +
                 (int) Double.doubleToLongBits(this.side1) +
                         (int) Double.doubleToLongBits(this.side2);
     }
 
+@Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -47,6 +50,6 @@ public class Rectangle implements Shape {
             return false;
         }
         Rectangle t = (Rectangle) o;
-        return (side1 == t.side1 && side2 == t.side2 || side1 == t.side2 && side2 == t.side1);
+        return (side1 == t.side1 && side2 == t.side2);
     }
 }

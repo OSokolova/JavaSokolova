@@ -25,11 +25,13 @@ public class Square implements Shape {
         return side * SQUARE_SIDE_NUMBER;
     }
 
+    @Override
     public int hashCode() {
         return 17 + NAME.hashCode() +
                 (int) Double.doubleToLongBits(this.side);
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -41,6 +43,7 @@ public class Square implements Shape {
         return (side == t.side);
     }
 
+    @Override
     public String toString() {
         return "Фигура " + NAME + ": периметр = " + getPerimeter() + ", площадь= " + getArea() +
                 ", высота = " + getHeight() + ", ширина = " + getWidth();

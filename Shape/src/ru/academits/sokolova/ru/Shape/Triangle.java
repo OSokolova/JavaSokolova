@@ -40,11 +40,13 @@ public class Triangle implements Shape {
         return getSide(x1, y1, x2, y2) + getSide(x1, y1, x3, y3) + getSide(x2, y2, x3, y3);
     }
 
+    @Override
     public String toString() {
         return "Фигура " + NAME + ": периметр = " + getPerimeter() + ", площадь= " + getArea() +
                 ", высота = " + getHeight() + ", ширина = " + getWidth();
     }
 
+    @Override
     public int hashCode() {
         return 17 + NAME.hashCode() +
                 (int) Double.doubleToLongBits(x1) +
@@ -55,7 +57,7 @@ public class Triangle implements Shape {
                 (int) Double.doubleToLongBits(y3);
     }
 
-
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -64,6 +66,6 @@ public class Triangle implements Shape {
             return false;
         }
         Triangle t = (Triangle) o;
-        return (x1 != t.x1 || y1 != t.y1 || x2 != t.x2 || y2 != t.y2 || x3 != t.x3 || y3 != t.y3);
+        return (x1 == t.x1 && y1 == t.y1 && x2 == t.x2 && y2 == t.y2 && x3 == t.x3 && y3 == t.y3);
     }
 }

@@ -1,4 +1,4 @@
-package ru.academits.sokolova.ru.Shape.Main;
+package Main;
 
 import ru.academits.sokolova.ru.Shape.*;
 

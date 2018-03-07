@@ -25,11 +25,13 @@ public class Circle implements Shape {
         return Math.PI * radius * 2;
     }
 
+    @Override
     public int hashCode() {
         return 17 + NAME.hashCode() +
                 (int) Double.doubleToLongBits(this.radius);
     }
-@Override
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -41,6 +43,7 @@ public class Circle implements Shape {
         return (radius == t.radius);
     }
 
+    @Override
     public String toString() {
         return "Фигура " + NAME + ": периметр = " + getPerimeter() + ", площадь= " + getArea() +
                 ", высота = " + getHeight() + ", ширина = " + getWidth();
