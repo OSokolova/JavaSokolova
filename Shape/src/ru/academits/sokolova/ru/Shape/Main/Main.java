@@ -16,9 +16,9 @@ public class Main {
                 new Square(40),
                 new Triangle(20, 50, 30, 80, 60, 20)
         };
-        Arrays.sort(figures, new SortByArea());
+        Arrays.sort(figures, new SortByAreaComparator());
         System.out.println(figures[figures.length - 1].toString());
-        Arrays.sort(figures, new SortByPerimeter());
+        Arrays.sort(figures, new SortByPerimeterComparator());
         System.out.println(figures[figures.length - 2].toString());
     }
 }

@@ -2,7 +2,7 @@ package ru.academits.sokolova.ru.Shape;
 
 
 public class Rectangle implements Shape {
-    static final String NAME = "прямоугольник";
+    private static final String NAME = "прямоугольник";
 
     private double side1;
     private double side2;
@@ -39,7 +39,7 @@ public class Rectangle implements Shape {
                         (int) Double.doubleToLongBits(this.side2);
     }
 
-    public boolean equals(Shape o) {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }

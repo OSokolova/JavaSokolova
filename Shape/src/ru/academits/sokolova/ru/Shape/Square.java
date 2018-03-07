@@ -1,8 +1,8 @@
 package ru.academits.sokolova.ru.Shape;
 
 public class Square implements Shape {
-    static final String NAME = "квадрат";
-    static final int SIDEsNUMBER = 4;
+    private static final String NAME = "квадрат";
+    private static final int SQUARE_SIDE_NUMBER = 4;
     private double side;
 
     public Square(double side) {
@@ -22,7 +22,7 @@ public class Square implements Shape {
     }
 
     public double getPerimeter() {
-        return side * SIDEsNUMBER;
+        return side * SQUARE_SIDE_NUMBER;
     }
 
     public int hashCode() {
@@ -30,7 +30,7 @@ public class Square implements Shape {
                 (int) Double.doubleToLongBits(this.side);
     }
 
-    public boolean equals(Shape o) {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }

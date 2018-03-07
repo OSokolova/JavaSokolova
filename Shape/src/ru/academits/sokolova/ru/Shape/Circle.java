@@ -1,7 +1,7 @@
 package ru.academits.sokolova.ru.Shape;
 
 public class Circle implements Shape {
-    static final String NAME = "круг";
+    private static final String NAME = "круг";
 
     private double radius;
 
@@ -29,8 +29,8 @@ public class Circle implements Shape {
         return 17 + NAME.hashCode() +
                 (int) Double.doubleToLongBits(this.radius);
     }
-
-    public boolean equals(Shape o) {
+@Override
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
