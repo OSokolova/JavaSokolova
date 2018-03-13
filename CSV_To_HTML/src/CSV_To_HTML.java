@@ -6,7 +6,7 @@ import java.util.Scanner;
 public class CSV_To_HTML {
     public static void main(String[] args) throws FileNotFoundException {
         try (PrintWriter writer = new PrintWriter("CSV1.html");
-             Scanner scanner = new Scanner(new FileInputStream("C:\\Users\\pingvin\\IdeaProjects\\JavaSokolova\\CSVtoHTML\\src\\CSV.csv"))) {
+             Scanner scanner = new Scanner(new FileInputStream("C:\\Users\\pingvin\\IdeaProjects\\JavaSokolova\\CSV_To_HTML\\src\\CSV.csv"))) {
             writer.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \n" +
                     "  \"http://www.w3.org/TR/html4/strict.dtd\">\n" +
                     "<html>" +
@@ -21,7 +21,7 @@ public class CSV_To_HTML {
                     writer.print("<tr>");
                     writer.print("<td>");
                 } else {
-                    writer.print("\n");
+                    writer.print("</br>");
                 }
                 for (int i = 0; i < s.length(); i++) {
                     if (s.charAt(i) != '"') {// если не кавычка
