@@ -7,12 +7,21 @@ import java.util.Scanner;
 
 public class CSVToHTML {
     public static void main(String... args) {
-        if (args.length < 2) {
-            System.out.println("Недостаточное количество аргументов");
+        if (args.length == 0) {
+            System.out.println("Отсутствуют файлы ввода/вывода");
             return;
         }
-        try (PrintWriter writer = new PrintWriter(args[0]);
-             Scanner scanner = new Scanner(new FileInputStream(args[1]))) {
+        if (args.length == 1) {
+            if (args[0].contains(".html")) {
+                System.out.println("Не указан входной файл");
+            } else {
+                System.out.println("Не указан файл для записи ");
+            }
+            return;
+        }
+
+        try (Scanner scanner = new Scanner(new FileInputStream(args[0]));
+             PrintWriter writer = new PrintWriter(args[1])) {
             writer.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"");
             writer.println(" \"http://www.w3.org/TR/html4/strict.dtd\">");
             writer.println("<html>");
@@ -76,7 +85,10 @@ public class CSVToHTML {
             writer.println("</table>");
             writer.println("</body>");
             writer.println("</html>");
-        } catch (FileNotFoundException e) {
+        } catch (
+                FileNotFoundException e)
+
+        {
             System.out.println("Файл не найден");
         }
     }
