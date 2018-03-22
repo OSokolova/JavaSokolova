@@ -5,12 +5,11 @@ import ru.academits.sokolova.Vector.Vector;
 import java.util.Arrays;
 
 
-public class Matrix extends Vector {
+public class Matrix {
     private Vector[] array;
 
 
     public Matrix(int n, int m) {//n строк m столбцов
-
         if (n <= 0 || m <= 0) {
             throw new IllegalArgumentException("Матрица такой размерности не существует");
         } else {
@@ -23,12 +22,14 @@ public class Matrix extends Vector {
     }
 
     public Matrix(double[][] array) {
-        super(array.length);
         if (array.length == 0) {
             throw new IllegalArgumentException("Матрица такой размерности не существует");
-        } else {
-            for (int i = 0; i < array.length; i++) {
-                this.array[i] = new Vector(array[i]);
+        }
+        this.array = new Vector[array.length];
+        for (int i = 0; i < array.length; i++) {
+            this.array[i] = new Vector(array[i]);
+            for (int j = 0; j < array[0].length; j++) {
+                this.array[i].setComponent(j, array[i][j]);
             }
         }
     }
@@ -43,7 +44,7 @@ public class Matrix extends Vector {
     }
 
     public String getMatrixSize() {
-        return array.length + " X" + array[1].getSize();
+        return array.length + " X" + array[0].getSize();
     }
 
     public Vector getRow(int rowNumber) {
@@ -80,27 +81,27 @@ public class Matrix extends Vector {
     }
 
     public double getDeterminant(Matrix matrix) {
-        double determinant = 0;
-        if (getSize() == 1) {
-            return array[0].getComponent(0);
+        if (matrix.array.length != matrix.array[0].getSize()) {
+            System.out.println("Это неквадратная матрица, для нее считают гипердетерминант, а не обычный детерминант");
+            return 0;
         }
-        for (int i = 0; i < array.length; i++) {
-            Matrix newMatrix = new Matrix(getSize() - 1, getSize() - 1);
-            for (int j = 0; j < newMatrix.array.length; j++) {
+        double determinant = 0;
+        int range = matrix.array.length;
+        if (range == 1) {
+            return matrix.array[0].getComponent(0);// определитель матрицы из одного элемента
+        }
+        for (int i = 0; i < range; i++) {// разложение по первому столбцу, i - номер строки
+            Matrix newMatrix = new Matrix(range - 1, range - 1);
+            for (int j = 0; j < range - 1; j++) {// заполнение строк новой матрицы старыми строками со сдвигом на один элемент
                 if (j < i) {
-                    newMatrix.setRow(j, new Vector(Arrays.copyOfRange(array[i].getArray(), 1, array.length - 1)));
+                    newMatrix.setRow(j, new Vector(Arrays.copyOfRange(matrix.array[j].getArray(), 1, range)));
+                } else {
+                    newMatrix.setRow(j, new Vector(Arrays.copyOfRange(matrix.array[j + 1].getArray(), 1, range)));
                 }
-                if (j == i) {
-                    continue;
-                }
-                if (j > i) {
-                    newMatrix.setRow(j - 1, new Vector(Arrays.copyOfRange(array[i].getArray(), 1, array.length - 1)));
-                }
-                determinant += Math.pow(-1, i + 1) *
-                        array[i].getComponent(1) *
-                        getDeterminant(newMatrix);
-
             }
+            determinant += Math.pow(-1, i) *
+                    matrix.array[i].getComponent(0) *
+                    getDeterminant(newMatrix);
         }
         return determinant;
     }
