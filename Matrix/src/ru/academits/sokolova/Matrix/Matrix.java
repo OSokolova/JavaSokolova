@@ -4,106 +4,179 @@ import ru.academits.sokolova.Vector.Vector;
 
 import java.util.Arrays;
 
-
 public class Matrix {
-    private Vector[] array;
+    private Vector[] vectors;
 
-
-    public Matrix(int n, int m) {//n строк m столбцов
-        if (n <= 0 || m <= 0) {
+    public Matrix(int rowNumber, int columnNumber) {//n строк m столбцов
+        if (rowNumber <= 0 || columnNumber <= 0) {
             throw new IllegalArgumentException("Матрица такой размерности не существует");
         } else {
-            this.array = new Vector[n];
+            this.vectors = new Vector[rowNumber];
+            for (int i = 0; i < rowNumber; i++) {
+                this.vectors[i] = new Vector(columnNumber);
+            }
         }
     }
 
     public Matrix(Matrix matrix) {
-        this.array = Arrays.copyOf(matrix.array, matrix.array.length);
+        this.vectors = new Vector[matrix.vectors.length];
+        for (int i = 0; i < matrix.vectors.length; i++) {
+            this.vectors[i] = new Vector(matrix.vectors[i]);
+        }
     }
 
     public Matrix(double[][] array) {
         if (array.length == 0) {
             throw new IllegalArgumentException("Матрица такой размерности не существует");
         }
-        this.array = new Vector[array.length];
+        this.vectors = new Vector[array.length];
+        int max = array[0].length;
+        for (double[] e : array) {
+            max = (e.length > max) ? e.length : max;
+        }
         for (int i = 0; i < array.length; i++) {
-            this.array[i] = new Vector(array[i]);
-            for (int j = 0; j < array[0].length; j++) {
-                this.array[i].setComponent(j, array[i][j]);
+            this.vectors[i] = new Vector(max);
+            for (int j = 0; j < array[i].length; j++) {
+                this.vectors[i].setComponent(j, array[i][j]);
             }
         }
     }
 
     public Matrix(Vector... array) {
-
         if (array.length == 0) {
             throw new IllegalArgumentException("Матрица такой размерности не существует");
         } else {
-            this.array = Arrays.copyOf(array, array.length);
+            this.vectors = new Vector[array.length];
+            int max = array[0].getSize();
+            for (Vector e : array) {
+                max = (e.getSize() > max) ? e.getSize() : max;
+            }
+            for (int i = 0; i < array.length; i++) {
+                this.vectors[i] = new Vector(max);
+                for (int j = 0; j < array[i].getSize(); j++) {
+                    this.vectors[i].setComponent(j, array[i].getComponent(j));
+                }
+            }
         }
     }
 
-    public String getMatrixSize() {
-        return array.length + " X" + array[0].getSize();
+    public int getRowNumber() {
+        return vectors.length;
+    }
+
+    public int getColumnNumber() {
+        return vectors[0].getSize();
     }
 
     public Vector getRow(int rowNumber) {
-        return new Vector(array[rowNumber]);
+        if (rowNumber < 0 || rowNumber >= vectors.length) {
+            throw new IndexOutOfBoundsException("Неправильный номер строки");
+        } else {
+            return new Vector(vectors[rowNumber]);
+        }
     }
 
     public void setRow(int rowNumber, Vector vector) {
-        this.array[rowNumber] = vector;
+        if (rowNumber < 0 || rowNumber >= vectors.length) {
+            throw new IndexOutOfBoundsException("Неправильный номер строки");
+        } else {
+            this.vectors[rowNumber] = new Vector(Arrays.copyOf(vector.getArray(), vector.getSize()));
+        }
     }
 
     public Vector getColumn(int columnNumber) {
-        double[] column = new double[array.length];
-        for (int i = 0; i < array.length; i++) {
-            column[i] = array[i].getComponent(columnNumber);
+        if (columnNumber < 0 || columnNumber >= vectors[0].getSize()) {
+            throw new IndexOutOfBoundsException("Неправильный номер столбца");
+        } else {
+            double[] column = new double[vectors.length];
+            for (int i = 0; i < vectors.length; i++) {
+                column[i] = vectors[i].getComponent(columnNumber);
+            }
+            return new Vector(column);
         }
-        return new Vector(column);
     }
 
-    public Matrix getTranspose() {// если нужно сохранить исходную матрицу, если не нужно, то все равно нужно создавать новую матрицу - копию исходной, или двумерный массив.
-        Matrix transposedMatrix = new Matrix(array[1].getSize(), array.length);
-        for (int i = 0; i < array.length; i++) {
-            for (int j = 0; j < array[1].getSize(); j++) {
-                transposedMatrix.array[j].setComponent(i, array[i].getComponent(j));
+    public Matrix transpose() {
+        int rowNumber = this.getRowNumber();
+        int columnNumber = this.getColumnNumber();
+        int maxSize = Math.max(rowNumber, columnNumber);
+        Vector[] temp1 = new Vector[maxSize];//из него будем брать
+        Vector[] temp2 = new Vector[maxSize];// в него будем вставлять
+        if (rowNumber < columnNumber) {
+            for (int i = 0; i < rowNumber; i++) {
+                temp1[i] = new Vector(vectors[i]);
+                temp2[i] = new Vector(vectors[i]);
+            }
+            for (int i = rowNumber; i < columnNumber; i++) {
+                temp1[i] = new Vector(columnNumber);
+                temp2[i] = new Vector(columnNumber);
+            }
+        } else {
+            for (int i = 0; i < rowNumber; i++) {
+                temp1[i] = new Vector(rowNumber, vectors[i].getArray());
+                temp2[i] = new Vector(rowNumber, vectors[i].getArray());
             }
         }
-        return transposedMatrix;
+        for (int i = 0; i < maxSize; i++) { // переставляем
+            for (int j = 0; j < maxSize; j++) {
+                double tempCell = temp1[i].getComponent(j);
+                temp2[i].setComponent(j, temp1[j].getComponent(i));
+                temp2[j].setComponent(i, tempCell);
+            }
+        }
+        this.vectors = new Vector[columnNumber];
+        for (int i = 0; i < columnNumber; i++) {//заполнили ее заново
+            vectors[i] = new Vector(rowNumber,temp2[i].getArray());
+        }
+        return this;
     }
 
     public Matrix getScalarMultiplication(double scalar) {
-        for (int i = 0; i < array.length; i++) {
-            array[i] = array[i].getMult(scalar);
+        for (Vector e : vectors) {
+            e.getMult(scalar);
         }
         return this;
     }
 
     public double getDeterminant(Matrix matrix) {
-        if (matrix.array.length != matrix.array[0].getSize()) {
+        if (matrix.vectors.length != matrix.vectors[0].getSize()) {
             System.out.println("Это неквадратная матрица, для нее считают гипердетерминант, а не обычный детерминант");
             return 0;
         }
         double determinant = 0;
-        int range = matrix.array.length;
+        int range = matrix.vectors.length;
         if (range == 1) {
-            return matrix.array[0].getComponent(0);// определитель матрицы из одного элемента
+            return matrix.vectors[0].getComponent(0);// определитель матрицы из одного элемента
         }
         for (int i = 0; i < range; i++) {// разложение по первому столбцу, i - номер строки
             Matrix newMatrix = new Matrix(range - 1, range - 1);
             for (int j = 0; j < range - 1; j++) {// заполнение строк новой матрицы старыми строками со сдвигом на один элемент
                 if (j < i) {
-                    newMatrix.setRow(j, new Vector(Arrays.copyOfRange(matrix.array[j].getArray(), 1, range)));
+                    newMatrix.setRow(j, new Vector(Arrays.copyOfRange(matrix.vectors[j].getArray(), 1, range)));
                 } else {
-                    newMatrix.setRow(j, new Vector(Arrays.copyOfRange(matrix.array[j + 1].getArray(), 1, range)));
+                    newMatrix.setRow(j, new Vector(Arrays.copyOfRange(matrix.vectors[j + 1].getArray(), 1, range)));
                 }
             }
             determinant += Math.pow(-1, i) *
-                    matrix.array[i].getComponent(0) *
+                    matrix.vectors[i].getComponent(0) *
                     getDeterminant(newMatrix);
         }
         return determinant;
+    }
+
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        s.append("{{");
+        for (Vector e : vectors) {
+            for (int j = 0; j < vectors[0].getArray().length; j++) {
+                s.append(e.getComponent(j)).append(", ");
+                if (j == vectors[0].getArray().length) {
+                    s.append("},{");
+                }
+            }
+            s.delete(s.length() - 2, s.length()).append("},{");
+        }
+        return s.delete(s.length() - 2, s.length()).append("}").toString();
     }
 }
 
