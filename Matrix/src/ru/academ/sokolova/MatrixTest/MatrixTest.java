@@ -5,7 +5,7 @@ import ru.academits.sokolova.Vector.Vector;
 
 public class MatrixTest {
     public static void main(String[] args) {
-        double[][] a = {{1, 1}, {2, 2},{3,3}};
+        double[][] a = {{0}, {0},{1}};
         Matrix n = new Matrix(2, 2);
         System.out.println(n);
         Matrix m = new Matrix(a);
