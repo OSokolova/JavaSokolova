@@ -3,7 +3,11 @@ package ru.academits.sokolova.Vector;
 import java.util.Arrays;
 
 public class Vector {
-    private double[] array;
+    private  double[] array;
+
+    public double[] getArray(){
+        return array;
+    }
 
     public Vector(int n) {
         if (n <= 0) {
