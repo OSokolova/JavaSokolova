@@ -3,18 +3,17 @@ package ru.academits.sokolova.Vector;
 import java.util.Arrays;
 
 public class Vector {
-    private  double[] array;
+    private double[] array;
 
-    public double[] getArray(){
-        return array;
+    public double[] toArray() {
+        return Arrays.copyOf(array,array.length);
     }
 
     public Vector(int n) {
         if (n <= 0) {
             throw new IllegalArgumentException("Вектор такой длины не существует");
-        } else {
-            this.array = new double[n];
         }
+        this.array = new double[n];
     }
 
     public Vector(Vector vector) {
@@ -24,17 +23,15 @@ public class Vector {
     public Vector(double... array) {
         if (array.length == 0) {
             throw new IllegalArgumentException("Вектор такой длины не существует");
-        } else {
-            this.array = Arrays.copyOf(array, array.length);
         }
+        this.array = Arrays.copyOf(array, array.length);
     }
 
     public Vector(int n, double... array) {
         if (n <= 0) {
             throw new IllegalArgumentException("Вектор такой длины не существует");
-        } else {
-            this.array = Arrays.copyOf(array, n);
         }
+        this.array = Arrays.copyOf(array, n);
     }
 
     public int getSize() {
