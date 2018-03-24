@@ -70,19 +70,19 @@ public class Matrix {
         return rows[0].getSize();
     }
 
-    public Vector getRow(int rowsNumber) {
-        if (rowsNumber < 0 || rowsNumber >= rows.length) {
+    public Vector getRow(int rowNumber) {
+        if (rowNumber < 0 || rowNumber >= rows.length) {
             throw new IndexOutOfBoundsException("Неправильный номер строки");
         } else {
-            return new Vector(rows[rowsNumber]);
+            return new Vector(rows[rowNumber]);
         }
     }
 
-    public void setRow(int rowsNumber, Vector vector) {
-        if (rowsNumber < 0 || rowsNumber >= rows.length) {
+    public void setRow(int rowNumber, Vector vector) {
+        if (rowNumber < 0 || rowNumber >= rows.length) {
             throw new IndexOutOfBoundsException("Неправильный номер строки");
         } else {
-            this.rows[rowsNumber] = new Vector(vector);
+            this.rows[rowNumber] = new Vector(vector);
         }
     }
 
@@ -98,10 +98,16 @@ public class Matrix {
     }
 
     public Matrix transpose() {
-        Matrix temp = new Matrix(this);
+        Vector[] temp = new Vector[getRowsNumber()];
+        for (int i = 0; i < getRowsNumber(); i++) {
+            temp[i] = new Vector(rows[i]);
+        }
         this.rows = new Vector[getColumnsNumber()];
-        for (int i = 0; i < temp.getColumnsNumber(); i++) {
-            rows[i] = temp.getColumn(i);
+        for (int i = 0; i < temp[0].getSize(); i++) {
+            rows[i] = new Vector(temp.length);
+            for (int j = 0; j < temp.length; j++) {
+                rows[i].setComponent(j, temp[j].getComponent(i));
+            }
         }
         return this;
     }
@@ -113,28 +119,28 @@ public class Matrix {
         return this;
     }
 
-    public double getDeterminant(Matrix matrix) {
-        if (matrix.rows.length != matrix.getColumnsNumber()) {
+    public double getDeterminant() {
+        if (this.rows.length != this.getColumnsNumber()) {
             System.out.println("Это неквадратная матрица, для нее считают гипердетерминант, а не обычный детерминант");
             return 0;
         }
         double determinant = 0;
-        int range = matrix.rows.length;
+        int range = this.rows.length;
         if (range == 1) {
-            return matrix.rows[0].getComponent(0);// определитель матрицы из одного элемента
+            return this.rows[0].getComponent(0);// определитель матрицы из одного элемента
         }
         for (int i = 0; i < range; i++) {// разложение по первому столбцу, i - номер строки
             Matrix newMatrix = new Matrix(range - 1, range - 1);
             for (int j = 0; j < range - 1; j++) {// заполнение строк новой матрицы старыми строками со сдвигом на один элемент
                 if (j < i) {
-                    newMatrix.setRow(j, new Vector(Arrays.copyOfRange(matrix.rows[j].getArray(), 1, range)));
+                    newMatrix.setRow(j, new Vector(Arrays.copyOfRange(this.rows[j].toArray(), 1, range)));
                 } else {
-                    newMatrix.setRow(j, new Vector(Arrays.copyOfRange(matrix.rows[j + 1].getArray(), 1, range)));
+                    newMatrix.setRow(j, new Vector(Arrays.copyOfRange(this.rows[j + 1].toArray(), 1, range)));
                 }
             }
             determinant += Math.pow(-1, i) *
-                    matrix.rows[i].getComponent(0) *
-                    getDeterminant(newMatrix);
+                    this.rows[i].getComponent(0) *
+                    newMatrix.getDeterminant();
         }
         return determinant;
     }
@@ -143,9 +149,9 @@ public class Matrix {
         StringBuilder s = new StringBuilder();
         s.append("{{");
         for (Vector e : rows) {
-            for (int j = 0; j < rows[0].getArray().length; j++) {
+            for (int j = 0; j < rows[0].toArray().length; j++) {
                 s.append(e.getComponent(j)).append(", ");
-                if (j == rows[0].getArray().length) {
+                if (j == rows[0].toArray().length) {
                     s.append("},{");
                 }
             }
@@ -158,7 +164,7 @@ public class Matrix {
         if (getColumnsNumber() != vector.getSize()) {
             throw new IndexOutOfBoundsException("Длина вектора не совпадает с числом строк матрицы");
         }
-        Vector multiplicationResult = new Vector(vector.getSize());
+        Vector multiplicationResult = new Vector(getRowsNumber());
         for (int i = 0; i < getRowsNumber(); i++) {
             multiplicationResult.setComponent(i, Vector.getMultiplication(this.rows[i], vector));
         }
@@ -186,23 +192,31 @@ public class Matrix {
     }
 
     public static Matrix getSum(Matrix matrix1, Matrix matrix2) {
+        if (matrix1.getRowsNumber() != matrix2.getRowsNumber() ||
+                matrix1.getColumnsNumber() != matrix2.getColumnsNumber()) {
+            throw new IllegalArgumentException("Размеры матриц должны быть одинаковы");
+        }
         return new Matrix(matrix1).getSum(matrix2);
     }
 
     public static Matrix getDiff(Matrix matrix1, Matrix matrix2) {
+        if (matrix1.getRowsNumber() != matrix2.getRowsNumber() ||
+                matrix1.getColumnsNumber() != matrix2.getColumnsNumber()) {
+            throw new IllegalArgumentException("Размеры матриц должны быть одинаковы");
+        }
         return new Matrix(matrix1).getDiff(matrix2);
     }
 
     public static Matrix getMultiplication(Matrix matrix1, Matrix matrix2) {
-        int n = matrix1.getColumnsNumber();
-        int m = matrix2.getRowsNumber();
-        if (n != m) {
-            throw new IndexOutOfBoundsException("Число столбцов первой матрицы должно быть равно числу строк второй");
+        if (matrix1.getColumnsNumber() != matrix2.getRowsNumber()) {
+            throw new IllegalArgumentException("Число столбцов первой матрицы должно быть равно числу строк второй");
         }
-        Matrix multiplicationResult = new Matrix(m, n);
-        for (int i = 0; i < n; i++) {
-            multiplicationResult.rows[i] = new Vector(n);
-            for (int j = 0; j < m; j++) {
+        int rowNumber = matrix1.getRowsNumber();
+        int columnNumber = matrix2.getColumnsNumber();
+        Matrix multiplicationResult = new Matrix(rowNumber, columnNumber);
+        for (int i = 0; i < rowNumber; i++) {
+            multiplicationResult.rows[i] = new Vector(columnNumber);
+            for (int j = 0; j < columnNumber; j++) {
                 multiplicationResult.rows[i].setComponent(j, Vector.getMultiplication(matrix1.rows[i], matrix2.transpose().rows[i]));
             }
         }
