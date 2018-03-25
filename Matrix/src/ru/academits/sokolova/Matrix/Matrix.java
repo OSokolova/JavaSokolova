@@ -7,7 +7,7 @@ import java.util.Arrays;
 public class Matrix {
     private Vector[] rows;
 
-    public Matrix(int rowsNumber, int columnsNumber) {//n строк m столбцов
+    public Matrix(int rowsNumber, int columnsNumber) {
         if (rowsNumber <= 0 || columnsNumber <= 0) {
             throw new IllegalArgumentException("Матрица такой размерности не существует");
         }
@@ -86,31 +86,29 @@ public class Matrix {
         }
     }
 
-    public Vector getColumn(int columnsNumber) {
-        if (columnsNumber < 0 || columnsNumber >= getColumnsNumber()) {
+    public Vector getColumn(int columnNumber) {
+        if (columnNumber < 0 || columnNumber >= getColumnsNumber()) {
             throw new IndexOutOfBoundsException("Неправильный номер столбца");
         }
         double[] column = new double[rows.length];
         for (int i = 0; i < rows.length; i++) {
-            column[i] = rows[i].getComponent(columnsNumber);
+            column[i] = rows[i].getComponent(columnNumber);
         }
         return new Vector(column);
     }
 
     public Matrix transpose() {
-        Vector[] temp = new Vector[getRowsNumber()];
-        for (int i = 0; i < getRowsNumber(); i++) {
-            temp[i] = new Vector(rows[i]);
+        Vector[] temp = new Vector[getColumnsNumber()];
+        for (int i = 0; i < getColumnsNumber(); i++) {
+            temp[i] = new Vector(getColumn(i));
         }
         this.rows = new Vector[getColumnsNumber()];
-        for (int i = 0; i < temp[0].getSize(); i++) {
-            rows[i] = new Vector(temp.length);
-            for (int j = 0; j < temp.length; j++) {
-                rows[i].setComponent(j, temp[j].getComponent(i));
-            }
+        for (int i = 0; i < temp.length; i++) {
+            setRow(i, temp[i]);
         }
         return this;
     }
+
 
     public Matrix getScalarMultiplication(double scalar) {
         for (Vector e : rows) {
@@ -147,15 +145,9 @@ public class Matrix {
 
     public String toString() {
         StringBuilder s = new StringBuilder();
-        s.append("{{");
+        s.append("{");
         for (Vector e : rows) {
-            for (int j = 0; j < rows[0].toArray().length; j++) {
-                s.append(e.getComponent(j)).append(", ");
-                if (j == rows[0].toArray().length) {
-                    s.append("},{");
-                }
-            }
-            s.delete(s.length() - 2, s.length()).append("},{");
+            s.append(e.toString()).append(", ");
         }
         return s.delete(s.length() - 2, s.length()).append("}").toString();
     }
@@ -211,13 +203,13 @@ public class Matrix {
         if (matrix1.getColumnsNumber() != matrix2.getRowsNumber()) {
             throw new IllegalArgumentException("Число столбцов первой матрицы должно быть равно числу строк второй");
         }
-        int rowNumber = matrix1.getRowsNumber();
-        int columnNumber = matrix2.getColumnsNumber();
-        Matrix multiplicationResult = new Matrix(rowNumber, columnNumber);
-        for (int i = 0; i < rowNumber; i++) {
-            multiplicationResult.rows[i] = new Vector(columnNumber);
-            for (int j = 0; j < columnNumber; j++) {
-                multiplicationResult.rows[i].setComponent(j, Vector.getMultiplication(matrix1.rows[i], matrix2.transpose().rows[i]));
+        int rowsNumber = matrix1.getRowsNumber();
+        int columnsNumber = matrix2.getColumnsNumber();
+        Matrix multiplicationResult = new Matrix(rowsNumber, columnsNumber);
+        for (int i = 0; i < rowsNumber; i++) {
+            multiplicationResult.rows[i] = new Vector(columnsNumber);
+            for (int j = 0; j < columnsNumber; j++) {
+                multiplicationResult.rows[i].setComponent(j, Vector.getMultiplication(matrix1.rows[i], matrix2.getColumn(j)));
             }
         }
         return multiplicationResult;
