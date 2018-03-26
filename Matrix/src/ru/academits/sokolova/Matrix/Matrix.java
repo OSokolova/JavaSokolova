@@ -47,17 +47,16 @@ public class Matrix {
     public Matrix(Vector... array) {
         if (array.length == 0) {
             throw new IllegalArgumentException("Матрица такой размерности не существует");
-        } else {
-            this.rows = new Vector[array.length];
-            int max = array[0].getSize();
-            for (Vector e : array) {
-                max = (e.getSize() > max) ? e.getSize() : max;
-            }
-            for (int i = 0; i < array.length; i++) {
-                this.rows[i] = new Vector(max);
-                for (int j = 0; j < array[i].getSize(); j++) {
-                    this.rows[i].setComponent(j, array[i].getComponent(j));
-                }
+        }
+        this.rows = new Vector[array.length];
+        int max = array[0].getSize();
+        for (Vector e : array) {
+            max = (e.getSize() > max) ? e.getSize() : max;
+        }
+        for (int i = 0; i < array.length; i++) {
+            this.rows[i] = new Vector(max);
+            for (int j = 0; j < array[i].getSize(); j++) {
+                this.rows[i].setComponent(j, array[i].getComponent(j));
             }
         }
     }
@@ -72,23 +71,23 @@ public class Matrix {
 
     public Vector getRow(int rowNumber) {
         if (rowNumber < 0 || rowNumber >= rows.length) {
-            throw new IndexOutOfBoundsException("Неправильный номер строки");
-        } else {
+            throw new IllegalArgumentException("Такой строки в матрице нет");
+        }
             return new Vector(rows[rowNumber]);
         }
-    }
+
 
     public void setRow(int rowNumber, Vector vector) {
         if (rowNumber < 0 || rowNumber >= rows.length) {
-            throw new IndexOutOfBoundsException("Неправильный номер строки");
-        } else {
+            throw new IllegalArgumentException("Такой строки в матрице нет");
+        }
             this.rows[rowNumber] = new Vector(vector);
         }
-    }
+
 
     public Vector getColumn(int columnNumber) {
         if (columnNumber < 0 || columnNumber >= getColumnsNumber()) {
-            throw new IndexOutOfBoundsException("Неправильный номер столбца");
+            throw new IllegalArgumentException("Неправильный номер столбца");
         }
         double[] column = new double[rows.length];
         for (int i = 0; i < rows.length; i++) {
@@ -100,9 +99,9 @@ public class Matrix {
     public Matrix transpose() {
         Vector[] temp = new Vector[getColumnsNumber()];
         for (int i = 0; i < getColumnsNumber(); i++) {
-            temp[i] = new Vector(getColumn(i));
+            temp[i] = getColumn(i);
         }
-        this.rows = new Vector[getColumnsNumber()];
+        this.rows = temp;
         for (int i = 0; i < temp.length; i++) {
             setRow(i, temp[i]);
         }
