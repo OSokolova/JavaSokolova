@@ -120,7 +120,7 @@ public class Matrix {
 
     public double getDeterminant() {
         if (this.rows.length != this.getColumnsNumber()) {
-            throw new InputMismatchException("Это неквадратная матрица, для нее считают гипердетерминант, а не обычный детерминант");
+            throw new IllegalArgumentException("Это неквадратная матрица, для нее считают гипердетерминант, а не обычный детерминант");
         }
 
         double determinant = 0;
