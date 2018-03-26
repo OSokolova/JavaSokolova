@@ -3,6 +3,7 @@ package ru.academits.sokolova.Matrix;
 import ru.academits.sokolova.Vector.Vector;
 
 import java.util.Arrays;
+import java.util.InputMismatchException;
 
 public class Matrix {
     private Vector[] rows;
@@ -11,6 +12,7 @@ public class Matrix {
         if (rowsNumber <= 0 || columnsNumber <= 0) {
             throw new IllegalArgumentException("Матрица такой размерности не существует");
         }
+
         this.rows = new Vector[rowsNumber];
         for (int i = 0; i < rowsNumber; i++) {
             this.rows[i] = new Vector(columnsNumber);
@@ -28,6 +30,7 @@ public class Matrix {
         if (array.length == 0) {
             throw new IllegalArgumentException("Матрица такой размерности не существует");
         }
+
         int max = array[0].length;
         for (double[] e : array) {
             max = Math.max(e.length, max);
@@ -35,6 +38,7 @@ public class Matrix {
         if (max == 0) {
             throw new IllegalArgumentException("Матрица такой размерности не существует");
         }
+
         this.rows = new Vector[array.length];
         for (int i = 0; i < array.length; i++) {
             this.rows[i] = new Vector(max);
@@ -48,11 +52,13 @@ public class Matrix {
         if (array.length == 0) {
             throw new IllegalArgumentException("Матрица такой размерности не существует");
         }
+
         this.rows = new Vector[array.length];
         int max = array[0].getSize();
         for (Vector e : array) {
             max = (e.getSize() > max) ? e.getSize() : max;
         }
+
         for (int i = 0; i < array.length; i++) {
             this.rows[i] = new Vector(max);
             for (int j = 0; j < array[i].getSize(); j++) {
@@ -73,22 +79,21 @@ public class Matrix {
         if (rowNumber < 0 || rowNumber >= rows.length) {
             throw new IllegalArgumentException("Такой строки в матрице нет");
         }
-            return new Vector(rows[rowNumber]);
-        }
-
+        return new Vector(rows[rowNumber]);
+    }
 
     public void setRow(int rowNumber, Vector vector) {
         if (rowNumber < 0 || rowNumber >= rows.length) {
             throw new IllegalArgumentException("Такой строки в матрице нет");
         }
-            this.rows[rowNumber] = new Vector(vector);
-        }
-
+        this.rows[rowNumber] = new Vector(vector);
+    }
 
     public Vector getColumn(int columnNumber) {
         if (columnNumber < 0 || columnNumber >= getColumnsNumber()) {
             throw new IllegalArgumentException("Неправильный номер столбца");
         }
+
         double[] column = new double[rows.length];
         for (int i = 0; i < rows.length; i++) {
             column[i] = rows[i].getComponent(columnNumber);
@@ -102,9 +107,6 @@ public class Matrix {
             temp[i] = getColumn(i);
         }
         this.rows = temp;
-        for (int i = 0; i < temp.length; i++) {
-            setRow(i, temp[i]);
-        }
         return this;
     }
 
@@ -118,14 +120,15 @@ public class Matrix {
 
     public double getDeterminant() {
         if (this.rows.length != this.getColumnsNumber()) {
-            System.out.println("Это неквадратная матрица, для нее считают гипердетерминант, а не обычный детерминант");
-            return 0;
+            throw new InputMismatchException("Это неквадратная матрица, для нее считают гипердетерминант, а не обычный детерминант");
         }
+
         double determinant = 0;
         int range = this.rows.length;
         if (range == 1) {
             return this.rows[0].getComponent(0);// определитель матрицы из одного элемента
         }
+
         for (int i = 0; i < range; i++) {// разложение по первому столбцу, i - номер строки
             Matrix newMatrix = new Matrix(range - 1, range - 1);
             for (int j = 0; j < range - 1; j++) {// заполнение строк новой матрицы старыми строками со сдвигом на один элемент
@@ -145,6 +148,7 @@ public class Matrix {
     public String toString() {
         StringBuilder s = new StringBuilder();
         s.append("{");
+
         for (Vector e : rows) {
             s.append(e.toString()).append(", ");
         }
@@ -155,6 +159,7 @@ public class Matrix {
         if (getColumnsNumber() != vector.getSize()) {
             throw new IndexOutOfBoundsException("Длина вектора не совпадает с числом строк матрицы");
         }
+
         Vector multiplicationResult = new Vector(getRowsNumber());
         for (int i = 0; i < getRowsNumber(); i++) {
             multiplicationResult.setComponent(i, Vector.getMultiplication(this.rows[i], vector));
@@ -166,6 +171,7 @@ public class Matrix {
         if (getColumnsNumber() != other.getColumnsNumber() || getRowsNumber() != other.getRowsNumber()) {
             throw new IndexOutOfBoundsException("Размеры матриц не совпадают");
         }
+
         for (int i = 0; i < getRowsNumber(); i++) {
             rows[i].getSum(other.rows[i]);
         }
@@ -176,6 +182,7 @@ public class Matrix {
         if (getColumnsNumber() != other.getColumnsNumber() || getRowsNumber() != other.getRowsNumber()) {
             throw new IndexOutOfBoundsException("Размеры матриц не совпадают");
         }
+
         for (int i = 0; i < getRowsNumber(); i++) {
             rows[i].getDiff(other.rows[i]);
         }
@@ -202,6 +209,7 @@ public class Matrix {
         if (matrix1.getColumnsNumber() != matrix2.getRowsNumber()) {
             throw new IllegalArgumentException("Число столбцов первой матрицы должно быть равно числу строк второй");
         }
+
         int rowsNumber = matrix1.getRowsNumber();
         int columnsNumber = matrix2.getColumnsNumber();
         Matrix multiplicationResult = new Matrix(rowsNumber, columnsNumber);
