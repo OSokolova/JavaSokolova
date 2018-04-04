@@ -1,5 +1,6 @@
 package ru.academits.sokolova.ArrayList;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 public class ArrayIterator<E> implements Iterator<E> {
