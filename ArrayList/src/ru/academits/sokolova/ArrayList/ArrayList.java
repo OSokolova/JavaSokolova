@@ -2,6 +2,8 @@ package ru.academits.sokolova.ArrayList;
 
 import java.util.*;
 
+
+
 public class ArrayList<E> implements List<E> {
     private E[] values;
     private int length;
@@ -9,12 +11,14 @@ public class ArrayList<E> implements List<E> {
     public ArrayList(E[] values) {
         this.values = Arrays.copyOf(values, values.length * 2);
         this.length = values.length;
-
     }
 
+
+    @SuppressWarnings(value = "")
     public ArrayList(int capacity) {
+
         this.values = (E[]) new Object[capacity * 2];
-        this.length = 0;
+        this.length = capacity;
     }
 
     @Override
@@ -29,8 +33,9 @@ public class ArrayList<E> implements List<E> {
 
     @Override
     public boolean remove(Object o) {
+        int index = indexOf(o);
         if (contains(o)) {
-            System.arraycopy(values, indexOf(o) + 1, values, indexOf(o), length - indexOf(o) - 1);
+            System.arraycopy(values, index + 1, values, index, length - index - 1);
             return true;
         }
         return false;
@@ -39,8 +44,9 @@ public class ArrayList<E> implements List<E> {
     @Override
     public boolean containsAll(Collection<?> c) {
         for (Object e : c) {
-            if (!contains(e))
+            if (!contains(e)) {
                 return false;
+            }
         }
         return true;
     }
@@ -48,16 +54,23 @@ public class ArrayList<E> implements List<E> {
     @Override
     public boolean addAll(Collection<? extends E> c) {
         Object[] array = c.toArray();
-        if (values.length - length <= c.size()) {
-            values = Arrays.copyOf(values, values.length + c.size() * 2);
-            System.arraycopy(array, 0, values, length, c.size());
-        }
-        return true;
+        int startDest = length;
+        ensureCapacity(length + array.length);
+        System.arraycopy(array, 0, values, startDest, array.length);
+        return (array.length != 0);
     }
 
     @Override
     public boolean addAll(int index, Collection<? extends E> c) {
-        return false;
+        if (index > length || index < 0) {
+            throw new IndexOutOfBoundsException("Индекс вышел за границы списка");
+        }
+        Object[] array = c.toArray();
+        ensureCapacity(length + array.length);
+        System.arraycopy(values, index, values, index + array.length, length - index);
+        System.arraycopy(array, 0, values, index, array.length);
+        length += array.length;
+        return (array.length != 0);
     }
 
     @Override
@@ -72,20 +85,20 @@ public class ArrayList<E> implements List<E> {
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        int i = 0;
-        for (Object o : c) {
-            if (contains(o)) {
-                add((E) o);
-                i++;
+        for (E e : values) {
+            if (!c.contains(e)) {
+                remove(e);
             }
         }
-        values = Arrays.copyOfRange(values, length, length + i);
-        return false;
+        return true;
     }
 
     @Override
     public void clear() {
-        values = Arrays.copyOf(values, 0);
+        for (int i = 0; i < length; i++) {
+            values[i] = null;
+        }
+        length = 0;
     }
 
     @Override
@@ -93,18 +106,24 @@ public class ArrayList<E> implements List<E> {
         if (index > length || index < 0) {
             throw new IndexOutOfBoundsException("Индекс вышел за границы списка");
         }
-        if (index == length) {
-            increaseCapacity();
-        }
+        ensureCapacity(length + 1);
+        System.arraycopy(values, index, values, index + 1, length - index);
         values[index] = e;
-        length++;
     }
 
     @Override
     public int indexOf(Object o) {
-        for (int i = 0; i < length; i++) {
-            if (values[i].equals(o)) {
-                return i;
+        if (o == null) {
+            for (int i = 0; i < length; i++) {
+                if (values[i] == null) {
+                    return i;
+                }
+            }
+        } else {
+            for (int i = 0; i < length; i++) {
+                if (values[i].equals(o)) {
+                    return i;
+                }
             }
         }
         return -1;
@@ -112,17 +131,46 @@ public class ArrayList<E> implements List<E> {
 
     @Override
     public int lastIndexOf(Object o) {
-        int lastIndex = 0;
-        for (int i = 0; i < length; i++) {
-            if (values[i].equals(o)) {
-                lastIndex = i;
+        if (o == null) {
+            for (int i = length - 1; i >= 0; i--) {
+                if (values[i] == null) {
+                    return i;
+                }
+            }
+        } else {
+            for (int i = length - 1; i >= 0; i--) {
+                if (values[i].equals(o)) {
+                    return i;
+                }
             }
         }
-        if (lastIndex == 0) {
-            return -1;
-        }
-        return lastIndex;
+        return -1;
     }
+
+    @Override
+    public ListIterator<E> listIterator() {
+        return new listItr(0);
+    }
+
+
+    @Override
+    public ListIterator<E> listIterator(int index) {
+        if (index > length || index < 0) {
+            throw new IndexOutOfBoundsException("Индекс вышел за границы списка");
+        }
+        return new listItr(index);
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        return new Itr();
+    }
+
+    @Override
+    public List<E> subList(int fromIndex, int toIndex) {
+        return null;
+    }
+
 
     @Override
     public E remove(int index) {
@@ -150,8 +198,9 @@ public class ArrayList<E> implements List<E> {
         if (index >= length || index < 0) {
             throw new IndexOutOfBoundsException("Индекс вышел за границы списка");
         }
+        E oldE = values[index];
         values[index] = e;
-        return e;
+        return oldE;
     }
 
     @Override
@@ -166,15 +215,11 @@ public class ArrayList<E> implements List<E> {
 
     @Override
     public boolean contains(Object o) {
-        for (E e : values) {
-            if (e.equals(o)) {
-                return true;
-            }
-        }
-        return false;
+        return (indexOf(o) > -1);
     }
 
-    public void increaseCapacity() {
+
+    private void increaseCapacity() {
         E[] old = values;
         values = Arrays.copyOf(old, old.length * 2);
     }
@@ -191,19 +236,89 @@ public class ArrayList<E> implements List<E> {
         }
     }
 
-    @Override
-    public Iterator<E> iterator() {
-        trimToSize();
-        return new ArrayIterator(values);
-    }
 
     @Override
     public Object[] toArray() {
-        return values;
+        return Arrays.copyOf(values, size());
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
-        return (T[]) values;
+        if (a.length < length) {
+            return (T[]) Arrays.copyOf(values, length, a.getClass());
+        }
+        System.arraycopy(values, 0, a, 0, length);
+        if (a.length > length)
+            a[length] = null;
+        return a;
+    }
+
+    private class listItr implements ListIterator<E> {
+        private int cursor;
+
+        public listItr(int index) {
+            super();
+            this.cursor = index;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return false;
+        }
+
+        @Override
+        public E next() {
+            return null;
+        }
+
+        @Override
+        public boolean hasPrevious() {
+            return cursor != 0;
+        }
+
+        @Override
+        public E previous() {
+            return null;
+        }
+
+        @Override
+        public int nextIndex() {
+            return 0;
+        }
+
+        @Override
+        public int previousIndex() {
+            return 0;
+        }
+
+        @Override
+        public void remove() {
+
+        }
+
+        @Override
+        public void set(E e) {
+
+        }
+
+        @Override
+        public void add(E e) {
+
+        }
+    }
+
+    private class Itr implements Iterator<E> {
+        int cursor;
+
+        @Override
+        public boolean hasNext() {
+            return cursor != length;
+        }
+
+        @Override
+        public E next() {
+            cursor++;
+            return values[cursor];
+        }
     }
 }

@@ -18,6 +18,7 @@ public class ArrayIterator<E> implements Iterator<E> {
 
     @Override
     public E next() {
-        return values[index++];
+        index++;
+        return values[index];
     }
 }
