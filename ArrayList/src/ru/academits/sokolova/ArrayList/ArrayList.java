@@ -3,20 +3,19 @@ package ru.academits.sokolova.ArrayList;
 import java.util.*;
 
 
-
 public class ArrayList<E> implements List<E> {
     private E[] values;
     private int length;
+    private int modCount = 0;
 
     public ArrayList(E[] values) {
         this.values = Arrays.copyOf(values, values.length * 2);
         this.length = values.length;
     }
 
-
-    @SuppressWarnings(value = "")
     public ArrayList(int capacity) {
 
+        //noinspection unchecked
         this.values = (E[]) new Object[capacity * 2];
         this.length = capacity;
     }
@@ -28,6 +27,7 @@ public class ArrayList<E> implements List<E> {
         }
         values[length] = e;
         length++;
+        modCount++;
         return true;
     }
 
@@ -36,6 +36,7 @@ public class ArrayList<E> implements List<E> {
         int index = indexOf(o);
         if (contains(o)) {
             System.arraycopy(values, index + 1, values, index, length - index - 1);
+            modCount++;
             return true;
         }
         return false;
@@ -57,6 +58,7 @@ public class ArrayList<E> implements List<E> {
         int startDest = length;
         ensureCapacity(length + array.length);
         System.arraycopy(array, 0, values, startDest, array.length);
+        modCount++;
         return (array.length != 0);
     }
 
@@ -70,6 +72,7 @@ public class ArrayList<E> implements List<E> {
         System.arraycopy(values, index, values, index + array.length, length - index);
         System.arraycopy(array, 0, values, index, array.length);
         length += array.length;
+        modCount++;
         return (array.length != 0);
     }
 
@@ -78,6 +81,7 @@ public class ArrayList<E> implements List<E> {
         for (Object o : c) {
             if (contains(o)) {
                 remove(o);
+                modCount++;
             }
         }
         return true;
@@ -88,6 +92,7 @@ public class ArrayList<E> implements List<E> {
         for (E e : values) {
             if (!c.contains(e)) {
                 remove(e);
+                modCount++;
             }
         }
         return true;
@@ -99,6 +104,7 @@ public class ArrayList<E> implements List<E> {
             values[i] = null;
         }
         length = 0;
+        modCount++;
     }
 
     @Override
@@ -109,6 +115,7 @@ public class ArrayList<E> implements List<E> {
         ensureCapacity(length + 1);
         System.arraycopy(values, index, values, index + 1, length - index);
         values[index] = e;
+        modCount++;
     }
 
     @Override
@@ -163,7 +170,7 @@ public class ArrayList<E> implements List<E> {
 
     @Override
     public Iterator<E> iterator() {
-        return new Itr();
+        return new ArrayListIterator();
     }
 
     @Override
@@ -182,6 +189,7 @@ public class ArrayList<E> implements List<E> {
             System.arraycopy(values, index + 1, values, index, length - index - 1);
         }
         length--;
+        modCount++;
         return removed;
     }
 
@@ -236,15 +244,15 @@ public class ArrayList<E> implements List<E> {
         }
     }
 
-
     @Override
     public Object[] toArray() {
-        return Arrays.copyOf(values, size());
+        return Arrays.copyOf(values, length);
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
         if (a.length < length) {
+            //noinspection unchecked
             return (T[]) Arrays.copyOf(values, length, a.getClass());
         }
         System.arraycopy(values, 0, a, 0, length);
@@ -254,7 +262,7 @@ public class ArrayList<E> implements List<E> {
     }
 
     private class listItr implements ListIterator<E> {
-        private int cursor;
+        private int cursor = -1;
 
         public listItr(int index) {
             super();
@@ -307,16 +315,23 @@ public class ArrayList<E> implements List<E> {
         }
     }
 
-    private class Itr implements Iterator<E> {
-        int cursor;
+    private class ArrayListIterator implements Iterator<E> {
+        int cursor = -1;
+        int expectedModCount = modCount;
 
         @Override
         public boolean hasNext() {
-            return cursor != length;
+            return cursor + 1 < length;
         }
 
         @Override
         public E next() {
+            if (cursor >= length) {
+                throw new NoSuchElementException("Список закончился");
+            }
+            if (modCount > expectedModCount) {
+                throw new ConcurrentModificationException("Список был изменен");
+            }
             cursor++;
             return values[cursor];
         }
