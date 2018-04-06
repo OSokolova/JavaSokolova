@@ -100,10 +100,11 @@ public class ArrayList<E> implements List<E> {
     @Override
     public boolean retainAll(Collection<?> c) {
         boolean modified = false;
-        for (E e : values) {
-            if (!c.contains(e)) {
-                remove(e);
-                modified = true;
+        for (Object o : c) {
+            while (!contains(o)) {
+                if (remove(o)) {
+                    modified = true;
+                }
             }
         }
         return modified;
