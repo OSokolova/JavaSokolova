@@ -73,9 +73,10 @@ public class ArrayList<E> implements List<E> {
         }
         ensureCapacity(length + c.size());
         System.arraycopy(values, index, values, index + c.size(), length - index);
+        int i = index;
         for (E e : c) {
-            values[index] = e;
-            index++;
+            values[i] = e;
+            i++;
         }
         if (c.size() != 0) {
             modCount++;
@@ -87,8 +88,10 @@ public class ArrayList<E> implements List<E> {
     public boolean removeAll(Collection<?> c) {
         boolean modified = false;
         for (Object o : c) {
-            if (o!=null && remove(o)) {
-                modified = true;
+            while (contains(o)) {
+                if (remove(o)) {
+                    modified = true;
+                }
             }
         }
         return modified;
@@ -98,8 +101,8 @@ public class ArrayList<E> implements List<E> {
     public boolean retainAll(Collection<?> c) {
         boolean modified = false;
         for (E e : values) {
-            if (e!=null && !c.contains(e)) {
-                this.remove(e);
+            if (!c.contains(e)) {
+                remove(e);
                 modified = true;
             }
         }
@@ -111,9 +114,9 @@ public class ArrayList<E> implements List<E> {
         if (length != 0) {
             modCount++;
         }
-        values[0] = null;
         length = 0;
     }
+
 
     @Override
     public void add(int index, E e) {
