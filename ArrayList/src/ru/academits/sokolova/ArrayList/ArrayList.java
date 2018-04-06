@@ -56,8 +56,13 @@ public class ArrayList<E> implements List<E> {
     public boolean addAll(Collection<? extends E> c) {
         int startDest = length;
         ensureCapacity(length + c.size());
-        System.arraycopy(c, 0, values, startDest, c.size());
-        modCount++;
+        for (E e : c) {
+            values[startDest] = e;
+            startDest++;
+        }
+        if (c.size() != 0) {
+            modCount++;
+        }
         return (c.size() != 0);
     }
 
@@ -68,9 +73,13 @@ public class ArrayList<E> implements List<E> {
         }
         ensureCapacity(length + c.size());
         System.arraycopy(values, index, values, index + c.size(), length - index);
-        System.arraycopy(c, 0, values, index, c.size());
-        length += c.size();
-        modCount++;
+        for (E e : c) {
+            values[index] = e;
+            index++;
+        }
+        if (c.size() != 0) {
+            modCount++;
+        }
         return (c.size() != 0);
     }
 
@@ -78,7 +87,7 @@ public class ArrayList<E> implements List<E> {
     public boolean removeAll(Collection<?> c) {
         boolean modified = false;
         for (Object o : c) {
-            if (remove(o)) {
+            if (o!=null && remove(o)) {
                 modified = true;
             }
         }
@@ -89,8 +98,8 @@ public class ArrayList<E> implements List<E> {
     public boolean retainAll(Collection<?> c) {
         boolean modified = false;
         for (E e : values) {
-            if (!c.contains(e)) {
-                remove(e);
+            if (e!=null && !c.contains(e)) {
+                this.remove(e);
                 modified = true;
             }
         }
@@ -99,17 +108,11 @@ public class ArrayList<E> implements List<E> {
 
     @Override
     public void clear() {
-        boolean modified = false;
-        for (int i = 0; i < length; i++) {
-            if (values[i] != null) {
-                values[i] = null;
-                modified = true;
-            }
-        }
-        length = 0;
-        if (modified) {
+        if (length != 0) {
             modCount++;
         }
+        values[0] = null;
+        length = 0;
     }
 
     @Override
@@ -125,7 +128,6 @@ public class ArrayList<E> implements List<E> {
 
     @Override
     public int indexOf(Object o) {
-
         for (int i = 0; i < length; i++) {
             if (Objects.equals(values[i], o)) {
                 return i;
@@ -136,17 +138,9 @@ public class ArrayList<E> implements List<E> {
 
     @Override
     public int lastIndexOf(Object o) {
-        if (o == null) {
-            for (int i = length - 1; i >= 0; i--) {
-                if (values[i] == null) {
-                    return i;
-                }
-            }
-        } else {
-            for (int i = length - 1; i >= 0; i--) {
-                if (values[i].equals(o)) {
-                    return i;
-                }
+        for (int i = length - 1; i >= 0; i++) {
+            if (Objects.equals(values[i], o)) {
+                return i;
             }
         }
         return -1;
@@ -154,7 +148,7 @@ public class ArrayList<E> implements List<E> {
 
     @Override
     public ListIterator<E> listIterator() {
-        return new listItr();
+        return new ListItr();
     }
 
 
@@ -163,7 +157,7 @@ public class ArrayList<E> implements List<E> {
         if (index > length || index < 0) {
             throw new IndexOutOfBoundsException("Индекс вышел за границы списка");
         }
-        return new listItr(index);
+        return new ListItr(index);
     }
 
     @Override
@@ -260,16 +254,16 @@ public class ArrayList<E> implements List<E> {
         return a;
     }
 
-    private class listItr implements ListIterator<E> {
+    private class ListItr implements ListIterator<E> {
         private int cursor = -1;
         int expectedModCount = modCount;
 
-        public listItr(int index) {
+        public ListItr(int index) {
             super();
             this.cursor = index;
         }
 
-        public listItr() {
+        public ListItr() {
             super();
         }
 
