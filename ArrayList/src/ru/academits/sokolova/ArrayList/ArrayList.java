@@ -34,7 +34,7 @@ public class ArrayList<E> implements List<E> {
     @Override
     public boolean remove(Object o) {
         int index = indexOf(o);
-        if (contains(o)) {
+        if (index != -1) {
             System.arraycopy(values, index + 1, values, index, length - index - 1);
             modCount++;
             return true;
@@ -54,12 +54,11 @@ public class ArrayList<E> implements List<E> {
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        Object[] array = c.toArray();
         int startDest = length;
-        ensureCapacity(length + array.length);
-        System.arraycopy(array, 0, values, startDest, array.length);
+        ensureCapacity(length + c.size());
+        System.arraycopy(c, 0, values, startDest, c.size());
         modCount++;
-        return (array.length != 0);
+        return (c.size() != 0);
     }
 
     @Override
@@ -67,44 +66,50 @@ public class ArrayList<E> implements List<E> {
         if (index > length || index < 0) {
             throw new IndexOutOfBoundsException("Индекс вышел за границы списка");
         }
-        Object[] array = c.toArray();
-        ensureCapacity(length + array.length);
-        System.arraycopy(values, index, values, index + array.length, length - index);
-        System.arraycopy(array, 0, values, index, array.length);
-        length += array.length;
+        ensureCapacity(length + c.size());
+        System.arraycopy(values, index, values, index + c.size(), length - index);
+        System.arraycopy(c, 0, values, index, c.size());
+        length += c.size();
         modCount++;
-        return (array.length != 0);
+        return (c.size() != 0);
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
+        boolean modified = false;
         for (Object o : c) {
-            if (contains(o)) {
-                remove(o);
-                modCount++;
+            if (remove(o)) {
+                modified = true;
             }
         }
-        return true;
+        return modified;
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
+        boolean modified = false;
         for (E e : values) {
             if (!c.contains(e)) {
                 remove(e);
-                modCount++;
+                modified = true;
             }
         }
-        return true;
+        return modified;
     }
 
     @Override
     public void clear() {
+        boolean modified = false;
         for (int i = 0; i < length; i++) {
-            values[i] = null;
+            if (values[i] != null) {
+                values[i] = null;
+                modified = true;
+            }
         }
         length = 0;
-        modCount++;
+        if (modified) {
+            modCount++;
+        }
     }
 
     @Override
@@ -120,17 +125,10 @@ public class ArrayList<E> implements List<E> {
 
     @Override
     public int indexOf(Object o) {
-        if (o == null) {
-            for (int i = 0; i < length; i++) {
-                if (values[i] == null) {
-                    return i;
-                }
-            }
-        } else {
-            for (int i = 0; i < length; i++) {
-                if (values[i].equals(o)) {
-                    return i;
-                }
+
+        for (int i = 0; i < length; i++) {
+            if (Objects.equals(values[i], o)) {
+                return i;
             }
         }
         return -1;
@@ -156,7 +154,7 @@ public class ArrayList<E> implements List<E> {
 
     @Override
     public ListIterator<E> listIterator() {
-        return new listItr(0);
+        return new listItr();
     }
 
 
@@ -256,62 +254,114 @@ public class ArrayList<E> implements List<E> {
             return (T[]) Arrays.copyOf(values, length, a.getClass());
         }
         System.arraycopy(values, 0, a, 0, length);
-        if (a.length > length)
+        if (a.length > length) {
             a[length] = null;
+        }
         return a;
     }
 
     private class listItr implements ListIterator<E> {
         private int cursor = -1;
+        int expectedModCount = modCount;
 
         public listItr(int index) {
             super();
             this.cursor = index;
         }
 
+        public listItr() {
+            super();
+        }
+
         @Override
         public boolean hasNext() {
-            return false;
+            return cursor + 1 < length;
         }
 
         @Override
         public E next() {
-            return null;
+            if (cursor >= length) {
+                throw new NoSuchElementException("Список закончился");
+            }
+            if (modCount != expectedModCount) {
+                throw new ConcurrentModificationException("Список был изменен");
+            }
+            cursor++;
+            return values[cursor];
         }
 
         @Override
         public boolean hasPrevious() {
-            return cursor != 0;
+            return cursor > 0;
         }
 
         @Override
         public E previous() {
-            return null;
+            if (cursor == 0) {
+                throw new NoSuchElementException("Список закончился");
+            }
+            if (modCount != expectedModCount) {
+                throw new ConcurrentModificationException("Список был изменен");
+            }
+            cursor--;
+            return values[cursor];
         }
 
         @Override
         public int nextIndex() {
-            return 0;
+            if (cursor >= length) {
+                throw new NoSuchElementException("Список закончился");
+            }
+            if (modCount != expectedModCount) {
+                throw new ConcurrentModificationException("Список был изменен");
+            }
+            return cursor + 1;
         }
 
         @Override
         public int previousIndex() {
-            return 0;
+            if (cursor == 0) {
+                throw new NoSuchElementException("Список закончился");
+            }
+            if (modCount != expectedModCount) {
+                throw new ConcurrentModificationException("Список был изменен");
+            }
+            return cursor - 1;
         }
 
         @Override
         public void remove() {
-
+            if (modCount != expectedModCount) {
+                throw new ConcurrentModificationException("Список был изменен");
+            }
+            if (cursor >= length || cursor < 0) {
+                throw new NoSuchElementException("Список закончился");
+            }
+            ArrayList.this.remove(cursor);
+            expectedModCount = modCount;
         }
 
         @Override
         public void set(E e) {
-
+            if (cursor >= length || cursor < 0) {
+                throw new NoSuchElementException("Список закончился");
+            }
+            if (modCount != expectedModCount) {
+                throw new ConcurrentModificationException("Список был изменен");
+            }
+            ArrayList.this.set(cursor, e);
         }
 
         @Override
         public void add(E e) {
-
+            if (cursor >= length || cursor < 0) {
+                throw new NoSuchElementException("Список закончился");
+            }
+            if (modCount != expectedModCount) {
+                throw new ConcurrentModificationException("Список был изменен");
+            }
+            ArrayList.this.add(cursor, e);
+            expectedModCount = modCount;
         }
     }
 
@@ -329,7 +379,7 @@ public class ArrayList<E> implements List<E> {
             if (cursor >= length) {
                 throw new NoSuchElementException("Список закончился");
             }
-            if (modCount > expectedModCount) {
+            if (modCount != expectedModCount) {
                 throw new ConcurrentModificationException("Список был изменен");
             }
             cursor++;
