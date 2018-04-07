@@ -87,13 +87,14 @@ public class ArrayList<E> implements List<E> {
     @Override
     public boolean removeAll(Collection<?> c) {
         boolean modified = false;
-        int i;
         for (Object o : c) {
-            while ((i = indexOf(o)) > -1) {
-                System.arraycopy(values, i + 1, values, i, length - i);
-                length--;
-                modCount++;
-                modified = true;
+            for (int i = 0; i < length; i++) {
+                if (Objects.equals(o, values[i])) {
+                    System.arraycopy(values, i + 1, values, i, length - i);
+                    length--;
+                    modCount++;
+                    modified = true;
+                }
             }
         }
         return modified;
@@ -102,13 +103,14 @@ public class ArrayList<E> implements List<E> {
     @Override
     public boolean retainAll(Collection<?> c) {
         boolean modified = false;
-        int i;
         for (Object o : c) {
-            while ((i = indexOf(o)) != -1) {
-                System.arraycopy(values, i + 1, values, i, length - i);
-                length--;
-                modCount++;
-                modified = true;
+            for (int i = 0; i < length; i++) {
+                if (!Objects.equals(o, values[i])) {
+                    System.arraycopy(values, i + 1, values, i, length - i);
+                    length--;
+                    modCount++;
+                    modified = true;
+                }
             }
         }
         return modified;
