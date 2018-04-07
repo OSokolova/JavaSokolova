@@ -87,11 +87,13 @@ public class ArrayList<E> implements List<E> {
     @Override
     public boolean removeAll(Collection<?> c) {
         boolean modified = false;
+        int i;
         for (Object o : c) {
-            while (contains(o)) {
-                if (remove(o)) {
-                    modified = true;
-                }
+            while ((i = indexOf(o)) > -1) {
+                System.arraycopy(values, i + 1, values, i, length - i);
+                length--;
+                modCount++;
+                modified = true;
             }
         }
         return modified;
@@ -100,11 +102,13 @@ public class ArrayList<E> implements List<E> {
     @Override
     public boolean retainAll(Collection<?> c) {
         boolean modified = false;
+        int i;
         for (Object o : c) {
-            while (!contains(o)) {
-                if (remove(o)) {
-                    modified = true;
-                }
+            while ((i = indexOf(o)) != -1) {
+                System.arraycopy(values, i + 1, values, i, length - i);
+                length--;
+                modCount++;
+                modified = true;
             }
         }
         return modified;
@@ -155,7 +159,6 @@ public class ArrayList<E> implements List<E> {
         return new ListItr();
     }
 
-
     @Override
     public ListIterator<E> listIterator(int index) {
         if (index > length || index < 0) {
@@ -173,7 +176,6 @@ public class ArrayList<E> implements List<E> {
     public List<E> subList(int fromIndex, int toIndex) {
         return null;
     }
-
 
     @Override
     public E remove(int index) {
@@ -222,7 +224,6 @@ public class ArrayList<E> implements List<E> {
         return (indexOf(o) > -1);
     }
 
-
     private void increaseCapacity() {
         E[] old = values;
         values = Arrays.copyOf(old, old.length * 2);
@@ -259,7 +260,7 @@ public class ArrayList<E> implements List<E> {
     }
 
     private class ListItr implements ListIterator<E> {
-        private int cursor = -1;
+        private int cursor;
         int expectedModCount = modCount;
 
         public ListItr(int index) {
@@ -278,14 +279,15 @@ public class ArrayList<E> implements List<E> {
 
         @Override
         public E next() {
-            if (cursor >= length) {
+            if (cursor >= length - 1) {
                 throw new NoSuchElementException("Список закончился");
             }
             if (modCount != expectedModCount) {
                 throw new ConcurrentModificationException("Список был изменен");
             }
-            cursor++;
-            return values[cursor];
+            int prevCursor = cursor;
+            cursor = prevCursor + 1;
+            return values[prevCursor];
         }
 
         @Override
