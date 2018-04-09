@@ -262,8 +262,8 @@ public class ArrayList<E> implements List<E> {
 
         public ListItr(int index) {
             super();
-            this.cursor = index;
-            if (index >= length || index < 0) {
+            this.cursor = index-1;
+            if (index > length || index < 0) {
                 throw new IllegalArgumentException("Такого индекса в списке нет");
             }
         }
