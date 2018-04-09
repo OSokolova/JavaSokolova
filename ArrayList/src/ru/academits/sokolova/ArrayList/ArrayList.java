@@ -95,9 +95,6 @@ public class ArrayList<E> implements List<E> {
                 i--;
             }
         }
-        if (modified) {
-            modCount++;
-        }
         return modified;
     }
 
@@ -110,9 +107,6 @@ public class ArrayList<E> implements List<E> {
                 modified = remove(e);
                 i--;
             }
-        }
-        if (modified) {
-            modCount++;
         }
         return modified;
     }
@@ -269,6 +263,9 @@ public class ArrayList<E> implements List<E> {
         public ListItr(int index) {
             super();
             this.cursor = index;
+            if (index >= length || index < 0) {
+                throw new IllegalArgumentException("Такого индекса в списке нет");
+            }
         }
 
         public ListItr() {
@@ -295,12 +292,12 @@ public class ArrayList<E> implements List<E> {
 
         @Override
         public boolean hasPrevious() {
-            return cursor > 0;
+            return cursor > -1;
         }
 
         @Override
         public E previous() {
-            if (cursor == 0) {
+            if (cursor <= -1) {
                 throw new NoSuchElementException("Список закончился");
             }
             if (modCount != expectedModCount) {
@@ -313,7 +310,7 @@ public class ArrayList<E> implements List<E> {
 
         @Override
         public int nextIndex() {
-            if (cursor >= length) {
+            if (cursor - 1 >= length) {
                 throw new NoSuchElementException("Список закончился");
             }
             if (modCount != expectedModCount) {
@@ -324,7 +321,7 @@ public class ArrayList<E> implements List<E> {
 
         @Override
         public int previousIndex() {
-            if (cursor == 0) {
+            if (cursor <= -1) {
                 throw new NoSuchElementException("Список закончился");
             }
             if (modCount != expectedModCount) {
