@@ -33,9 +33,10 @@ public class ArrayList<E> implements List<E> {
 
     @Override
     public boolean remove(Object o) {
-        int index = indexOf(o);
+        int index = this.indexOf(o);
         if (index != -1) {
             System.arraycopy(values, index + 1, values, index, length - index - 1);
+            length--;
             modCount++;
             return true;
         }
@@ -87,9 +88,11 @@ public class ArrayList<E> implements List<E> {
     @Override
     public boolean removeAll(Collection<?> c) {
         boolean modified = false;
-        for (Object o : values) {
-            if (c.contains(o)) {
-                modified = remove(o);
+        for (int i = 0; i < length; i++) {
+            E e = values[i];
+            if (c.contains(e)) {
+                modified = remove(e);
+                i--;
             }
         }
         if (modified) {
@@ -101,9 +104,11 @@ public class ArrayList<E> implements List<E> {
     @Override
     public boolean retainAll(Collection<?> c) {
         boolean modified = false;
-        for (Object o : values) {
-            if (!c.contains(o)) {
-                modified = remove(o);
+        for (int i = 0; i < length; i++) {
+            E e = values[i];
+            if (!c.contains(e)) {
+                modified = remove(e);
+                i--;
             }
         }
         if (modified) {
@@ -134,8 +139,8 @@ public class ArrayList<E> implements List<E> {
 
     @Override
     public int indexOf(Object o) {
-        for (int i = 0; i < length; i++) {
-            if (Objects.equals(values[i], o)) {
+        for (int i = 0; i < this.length; i++) {
+            if (Objects.equals(this.values[i], o)) {
                 return i;
             }
         }
