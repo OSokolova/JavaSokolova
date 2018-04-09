@@ -87,15 +87,13 @@ public class ArrayList<E> implements List<E> {
     @Override
     public boolean removeAll(Collection<?> c) {
         boolean modified = false;
-        for (Object o : c) {
-            for (int i = 0; i < length; i++) {
-                if (Objects.equals(o, values[i])) {
-                    System.arraycopy(values, i + 1, values, i, length - i);
-                    length--;
-                    modCount++;
-                    modified = true;
-                }
+        for (Object o : values) {
+            if (c.contains(o)) {
+                modified = remove(o);
             }
+        }
+        if (modified) {
+            modCount++;
         }
         return modified;
     }
@@ -103,15 +101,13 @@ public class ArrayList<E> implements List<E> {
     @Override
     public boolean retainAll(Collection<?> c) {
         boolean modified = false;
-        for (Object o : c) {
-            for (int i = 0; i < length; i++) {
-                if (!Objects.equals(o, values[i])) {
-                    System.arraycopy(values, i + 1, values, i, length - i);
-                    length--;
-                    modCount++;
-                    modified = true;
-                }
+        for (Object o : values) {
+            if (!c.contains(o)) {
+                modified = remove(o);
             }
+        }
+        if (modified) {
+            modCount++;
         }
         return modified;
     }
@@ -272,6 +268,7 @@ public class ArrayList<E> implements List<E> {
 
         public ListItr() {
             super();
+            this.cursor = -1;
         }
 
         @Override
@@ -281,15 +278,14 @@ public class ArrayList<E> implements List<E> {
 
         @Override
         public E next() {
-            if (cursor >= length - 1) {
+            if (cursor + 1 >= length) {
                 throw new NoSuchElementException("Список закончился");
             }
             if (modCount != expectedModCount) {
                 throw new ConcurrentModificationException("Список был изменен");
             }
-            int prevCursor = cursor;
-            cursor = prevCursor + 1;
-            return values[prevCursor];
+            cursor++;
+            return values[cursor];
         }
 
         @Override
@@ -305,8 +301,9 @@ public class ArrayList<E> implements List<E> {
             if (modCount != expectedModCount) {
                 throw new ConcurrentModificationException("Список был изменен");
             }
+            int prevCursor = cursor;
             cursor--;
-            return values[cursor];
+            return values[prevCursor];
         }
 
         @Override
